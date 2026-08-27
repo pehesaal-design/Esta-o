@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="escuro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Estação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --ink:#0E1418; --surf:#151D24; --surf2:#1C2730; --line:#28343D;
+  --tx:#E3EAEE; --mut:#8A99A4; --acc:#E9DDC7; --acc-tx:#12181C;
+  --t0:#D6423C; --t1:#E0803A; --t2:#D9BB3F; --t3:#4FA86A; --t4:#4C86C6; --t5:#5A6873;
+  --r:6px; --rail:212px; --det:360px;
+  --f-ui:"Space Grotesk",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,monospace;
+  --f-ler:"Source Serif 4",Georgia,serif;
+}
+[data-tema="claro"]{
+  --ink:#F3F5F1; --surf:#FFFFFF; --surf2:#E9ECE5; --line:#D8DCD2;
+  --tx:#131A1E; --mut:#66717A; --acc:#1C2730; --acc-tx:#F3F5F1;
+  --t0:#B8322D; --t1:#BE6821; --t2:#9C8410; --t3:#39804F; --t4:#3A6DA6; --t5:#7A868F;
+}
+/* Tamanho do texto — quatro níveis, guardados no aparelho. */
+:root{--tx-base:14px; --tx-nota:17px; --tx-h1:21px; --tx-notatit:33px}
+[data-fonte="p"] {--tx-base:13px; --tx-nota:15px; --tx-h1:20px; --tx-notatit:30px}
+[data-fonte="g"] {--tx-base:16px; --tx-nota:20px; --tx-h1:24px; --tx-notatit:37px}
+[data-fonte="gg"]{--tx-base:18px; --tx-nota:23px; --tx-h1:27px; --tx-notatit:41px}
+
+*{box-sizing:border-box;margin:0;padding:0}
+/* Qualquer display definido numa classe vence o hidden do HTML. Sem esta linha,
+   a camada do diálogo e a tarja de aviso ficam visíveis mesmo escondidas. */
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--ink);color:var(--tx);font-family:var(--f-ui);font-size:var(--tx-base);line-height:1.45;-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:3px}
+::selection{background:var(--acc);color:var(--acc-tx)}
+.mono{font-family:var(--f-mono)}
+.eyebrow{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+
+/* ---------- estrutura ---------- */
+#app{display:grid;grid-template-columns:var(--rail) minmax(0,1fr) 0;height:100dvh;transition:grid-template-columns .18s ease}
+#app.com-detalhe{grid-template-columns:var(--rail) minmax(0,1fr) var(--det)}
+.rail{background:var(--surf);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+.centro{display:flex;flex-direction:column;overflow:hidden;background:var(--ink)}
+.detalhe{background:var(--surf);border-left:1px solid var(--line);overflow-y:auto;overflow-x:hidden}
+
+/* ---------- rail ---------- */
+.marca{padding:16px 16px 12px;display:flex;align-items:baseline;gap:8px;border-bottom:1px solid var(--line)}
+.marca b{font-size:16px;font-weight:700;letter-spacing:-.02em}
+.rail nav{padding:10px 8px;display:flex;flex-direction:column;gap:1px}
+.nav-i{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:var(--r);color:var(--mut);width:100%;text-align:left;font-weight:500}
+.nav-i:hover{background:var(--surf2);color:var(--tx)}
+.nav-i[aria-current="true"]{background:var(--surf2);color:var(--tx)}
+.nav-i .cnt{margin-left:auto;font-family:var(--f-mono);font-size:11px;color:var(--mut)}
+.nav-i svg{width:15px;height:15px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6}
+.rail-sec{padding:14px 16px 6px;display:flex;align-items:center;justify-content:space-between}
+.rail-lista{padding:0 8px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:1px}
+.chip-cat{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:var(--r);color:var(--mut);width:100%;text-align:left}
+.chip-cat:hover{background:var(--surf2);color:var(--tx)}
+.chip-cat[aria-current="true"]{background:var(--surf2);color:var(--tx)}
+.chip-cat .cnt{margin-left:auto;font-family:var(--f-mono);font-size:11px}
+.chip-cat .x{margin-left:auto;opacity:0;color:var(--mut)}
+.chip-cat:hover .x{opacity:1}
+.rail-pe{border-top:1px solid var(--line);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.barra-uso{height:3px;background:var(--surf2);border-radius:2px;overflow:hidden}
+.barra-uso i{display:block;height:100%;background:var(--acc);width:0}
+.pe-botoes{display:flex;gap:6px;flex-wrap:wrap}
+.btn-min{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:4px 7px;border:1px solid var(--line);border-radius:4px}
+.btn-min:hover{color:var(--tx);border-color:var(--mut)}
+
+/* ---------- topo do centro ---------- */
+.topo{padding:16px 22px 0;display:flex;flex-direction:column;gap:12px;border-bottom:1px solid var(--line)}
+.topo h1{font-size:var(--tx-h1);font-weight:600;letter-spacing:-.02em}
+.topo-l1{display:flex;align-items:center;gap:14px}
+.busca{margin-left:auto;display:flex;align-items:center;gap:7px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:5px 9px;min-width:180px}
+.busca input{background:none;border:none;outline:none;width:100%;font-size:13px}
+.busca input::placeholder{color:var(--mut)}
+.quadro{display:flex;gap:2px;padding-bottom:14px;flex-wrap:wrap}
+.q-i{display:flex;align-items:center;gap:6px;padding:4px 9px 4px 7px;border-radius:20px;border:1px solid transparent;font-family:var(--f-mono);font-size:11px;color:var(--mut)}
+.q-i:hover{border-color:var(--line)}
+.q-i[aria-pressed="true"]{border-color:var(--line);background:var(--surf);color:var(--tx)}
+.q-i .pt{width:7px;height:7px;border-radius:50%;flex:none}
+.q-i.zero{opacity:.4}
+
+/* ---------- captura ---------- */
+.captura{margin:14px 22px 0;display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:10px 13px}
+.captura:focus-within{border-color:var(--mut)}
+.captura input{flex:1;background:none;border:none;outline:none;font-size:var(--tx-base)}
+.captura input::placeholder{color:var(--mut)}
+.captura .dica{font-family:var(--f-mono);font-size:10px;color:var(--mut);white-space:nowrap}
+.captura .ent{background:var(--acc);color:var(--acc-tx);font-weight:600;font-size:12px;padding:5px 11px;border-radius:4px}
+
+/* ---------- lista ---------- */
+.rolagem{flex:1;overflow-y:auto;padding:14px 22px 80px}
+.grupo-tit{display:flex;align-items:center;gap:10px;margin:18px 0 8px}
+.grupo-tit:first-child{margin-top:4px}
+.grupo-tit hr{flex:1;border:none;border-top:1px solid var(--line)}
+.item{display:flex;gap:12px;align-items:flex-start;background:var(--surf);border:1px solid var(--line);border-left-width:3px;border-radius:var(--r);padding:10px 13px;margin-bottom:5px;cursor:pointer;position:relative}
+.item:hover{border-color:var(--mut);border-left-color:inherit}
+.item[aria-selected="true"]{border-color:var(--acc);border-left-color:inherit}
+.item.feito{opacity:.5}
+.item.feito .tit{text-decoration:line-through}
+.marca-ok{width:16px;height:16px;border:1.5px solid var(--mut);border-radius:4px;flex:none;margin-top:2px;display:grid;place-items:center}
+.marca-ok:hover{border-color:var(--acc)}
+.marca-ok svg{width:11px;height:11px;stroke:var(--acc-tx);fill:none;stroke-width:2.5;opacity:0}
+.item.feito .marca-ok{background:var(--t5);border-color:var(--t5)}
+.item.feito .marca-ok svg{opacity:1;stroke:var(--surf)}
+.corpo{flex:1;min-width:0}
+.tit{font-weight:500;word-break:break-word}
+.meta{display:flex;align-items:center;gap:9px;margin-top:4px;flex-wrap:wrap;font-family:var(--f-mono);font-size:11px;color:var(--mut)}
+.tri{display:inline-flex;align-items:center;gap:5px;font-weight:500}
+.tri .pt{width:7px;height:7px;border-radius:50%}
+.tag-cat{padding:1px 6px;border:1px solid var(--line);border-radius:3px}
+.prog{display:inline-flex;align-items:center;gap:5px}
+.prog-b{width:34px;height:3px;background:var(--surf2);border-radius:2px;overflow:hidden}
+.prog-b i{display:block;height:100%;background:var(--mut)}
+.vazio{text-align:center;padding:64px 20px;color:var(--mut)}
+.vazio p{margin:8px auto 0;max-width:34ch;font-size:13px}
+
+/* ---------- detalhe ---------- */
+.det-topo{position:sticky;top:0;background:var(--surf);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;gap:10px;z-index:2}
+.det-corpo{padding:16px 18px 60px;display:flex;flex-direction:column;gap:18px}
+.campo{display:flex;flex-direction:column;gap:6px}
+.det-tit{font-size:18px;font-weight:600;background:none;border:none;outline:none;width:100%;resize:none;line-height:1.3;letter-spacing:-.01em;font-family:var(--f-ui)}
+.grade2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctrl{background:var(--ink);border:1px solid var(--line);border-radius:var(--r);padding:7px 9px;outline:none;width:100%;font-size:13px}
+.ctrl:focus{border-color:var(--mut)}
+select.ctrl{appearance:none;cursor:pointer}
+textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size:var(--tx-nota);line-height:1.6}
+.passo{display:flex;align-items:center;gap:9px;padding:5px 0}
+.passo input[type=text]{flex:1;background:none;border:none;outline:none;font-size:13px}
+.passo.ok input[type=text]{text-decoration:line-through;color:var(--mut)}
+.passo .x{opacity:0;color:var(--mut)}
+.passo:hover .x{opacity:1}
+.anexo{display:flex;align-items:center;gap:9px;padding:6px 8px;background:var(--ink);border:1px solid var(--line);border-radius:var(--r);margin-bottom:4px}
+.anexo .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.acoes{display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
+.btn{border:1px solid var(--line);border-radius:var(--r);padding:7px 12px;font-size:12px;font-weight:500;color:var(--mut)}
+.btn:hover{color:var(--tx);border-color:var(--mut)}
+.btn-forte{background:var(--acc);color:var(--acc-tx);border-color:var(--acc);font-weight:600}
+.btn-forte:hover{color:var(--acc-tx);opacity:.9}
+.btn-risco:hover{color:var(--t0);border-color:var(--t0)}
+
+/* ---------- arquivos ---------- */
+.solta{border:1px dashed var(--line);border-radius:var(--r);padding:26px;text-align:center;color:var(--mut);margin-bottom:14px}
+.solta.ativo{border-color:var(--acc);color:var(--tx);background:var(--surf)}
+.arq{display:flex;align-items:center;gap:12px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:9px 12px;margin-bottom:5px;cursor:pointer}
+.arq:hover{border-color:var(--mut)}
+.ic{width:32px;height:32px;border-radius:5px;background:var(--surf2);display:grid;place-items:center;flex:none;font-family:var(--f-mono);font-size:9px;font-weight:700;color:var(--mut);letter-spacing:.02em}
+
+/* ---------- editor de notas em página cheia ---------- */
+.ed{max-width:760px;margin:0 auto}
+.ed-barra{position:sticky;top:0;z-index:3;background:var(--ink);display:flex;align-items:center;gap:2px;padding:8px 0 9px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tb{padding:5px 9px;border-radius:4px;color:var(--mut);font-size:13px;font-weight:600;min-width:30px}
+.tb:hover{background:var(--surf2);color:var(--tx)}
+.tb.serif{font-family:var(--f-ler)}
+.sep{width:1px;height:18px;background:var(--line);margin:0 5px}
+.tb-sel{background:none;border:1px solid var(--line);border-radius:4px;color:var(--mut);font-size:12px;padding:4px 6px;cursor:pointer}
+.tb-sel:hover{color:var(--tx);border-color:var(--mut)}
+.menu{position:relative;margin-left:auto}
+.menu-lista{position:absolute;right:0;top:calc(100% + 6px);background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:4px;min-width:190px;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.menu-lista button{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:4px;font-size:13px;color:var(--tx)}
+.menu-lista button:hover{background:var(--surf2)}
+.menu-lista .nota-menu{padding:6px 10px;color:var(--mut);font-size:11px;font-family:var(--f-mono);line-height:1.4}
+.ed-tit{font-size:var(--tx-notatit);font-weight:700;letter-spacing:-.03em;line-height:1.15;border:none;background:none;outline:none;width:100%;margin:34px 0 2px;font-family:var(--f-ui);resize:none;overflow:hidden}
+.ed-tit::placeholder{color:var(--mut);opacity:.55}
+.ed-corpo{font-family:var(--f-ler);font-size:var(--tx-nota);line-height:1.75;outline:none;min-height:58vh;padding:10px 0 30px}
+.ed-corpo:empty::before{content:attr(data-vazio);color:var(--mut)}
+.ed-corpo h2{font-family:var(--f-ui);font-size:23px;font-weight:600;letter-spacing:-.02em;margin:26px 0 6px}
+.ed-corpo h3{font-family:var(--f-ui);font-size:18px;font-weight:600;margin:20px 0 4px}
+.ed-corpo p{margin:0 0 10px}
+.ed-corpo ul,.ed-corpo ol{margin:8px 0 12px 22px}
+.ed-corpo li{margin-bottom:4px}
+.ed-corpo blockquote{border-left:2px solid var(--acc);padding-left:14px;margin:12px 0;color:var(--mut)}
+.ed-corpo img{max-width:100%;height:auto;border-radius:var(--r);border:1px solid var(--line);margin:14px 0;display:block}
+.ed-corpo hr{border:none;border-top:1px solid var(--line);margin:22px 0}
+.ed-pe{border-top:1px solid var(--line);margin-top:24px;padding:12px 0 60px;display:flex;gap:8px;align-items:center}
+.rapidos{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+
+/* ---------- impressão / PDF ---------- */
+#imprimivel{display:none}
+@media print{
+  @page{margin:2.2cm}
+  html,body{height:auto;overflow:visible;background:#fff}
+  #app,.tabbar,.aviso{display:none!important}
+  #imprimivel{display:block;color:#000;background:#fff;font-family:"Source Serif 4",Georgia,serif;font-size:12pt;line-height:1.6}
+  #imprimivel h1{font-family:"Space Grotesk",sans-serif;font-size:21pt;margin:0 0 4pt}
+  #imprimivel .data{font-size:9pt;color:#555;margin-bottom:18pt}
+  #imprimivel h2{font-family:"Space Grotesk",sans-serif;font-size:15pt;margin:16pt 0 4pt}
+  #imprimivel h3{font-family:"Space Grotesk",sans-serif;font-size:12.5pt;margin:12pt 0 3pt}
+  #imprimivel img{max-width:100%;page-break-inside:avoid}
+  #imprimivel blockquote{border-left:2pt solid #999;padding-left:10pt;color:#444}
+}
+
+/* ---------- diálogos próprios ---------- */
+.modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:rgba(5,9,12,.62);padding:20px}
+.modal-cx{background:var(--surf);border:1px solid var(--line);border-radius:8px;padding:20px;width:100%;max-width:420px;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.modal-cx h3{font-size:16px;font-weight:600;letter-spacing:-.01em}
+.modal-cx p{color:var(--mut);font-size:13px;margin-top:6px}
+.modal-cx .ctrl{margin-top:14px}
+.modal-cx .acoes{border-top:none;padding-top:0;margin-top:18px;justify-content:flex-end}
+.btn-perigo{background:var(--t0);border-color:var(--t0);color:#fff;font-weight:600}
+.btn-perigo:hover{color:#fff;opacity:.9}
+
+/* ---------- avisos / mobile ---------- */
+.aviso{background:var(--t1);color:#12181C;padding:8px 22px;font-size:12px;font-weight:500;display:flex;gap:8px;align-items:center}
+.tabbar{display:none}
+.recuo{display:none}
+@media (max-width:860px){
+  #app,#app.com-detalhe{grid-template-columns:1fr}
+  .rail{display:none}
+  .detalhe{position:fixed;inset:0;z-index:40;border:none;display:none}
+  #app.com-detalhe .detalhe{display:block}
+  .recuo{display:grid;place-items:center}
+  .topo,.captura,.rolagem{padding-left:14px;padding-right:14px}
+  .captura{margin-left:14px;margin-right:14px}
+  .captura .dica{display:none}
+  .rolagem{padding-bottom:96px}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;left:0;right:0;background:var(--surf);border-top:1px solid var(--line);z-index:30;padding-bottom:env(safe-area-inset-bottom)}
+  .tab{padding:9px 0 11px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--mut);font-family:var(--f-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase}
+  .tab[aria-current="true"]{color:var(--tx)}
+  .tab svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div id="aviso" class="aviso" hidden></div>
+
+<div id="app">
+  <aside class="rail">
+    <div class="marca"><b>Estação</b><span class="eyebrow" id="hoje-label"></span></div>
+    <nav id="nav"></nav>
+    <div class="rail-sec"><span class="eyebrow" id="sec-tit">Categorias</span>
+      <button class="btn-min" id="sec-add">+</button></div>
+    <div class="rail-lista" id="sec-lista"></div>
+    <div class="rail-pe">
+      <div>
+        <div class="eyebrow" style="margin-bottom:5px"><span id="uso-rot">Armazenamento</span> <span class="mono" id="uso-tx" style="float:right;text-transform:none;letter-spacing:0"></span></div>
+        <div class="barra-uso"><i id="uso-b"></i></div>
+      </div>
+      <div id="conta"></div>
+      <div class="pe-botoes">
+        <button class="btn-min" id="b-tema">Tema</button>
+        <button class="btn-min" id="b-fonte">Aa</button>
+        <button class="btn-min" id="b-exp">Exportar</button>
+        <button class="btn-min" id="b-imp">Importar</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="centro">
+    <header class="topo">
+      <div class="topo-l1">
+        <button class="recuo btn-min" id="b-menu">≡</button>
+        <h1 id="titulo">Hoje</h1>
+        <div class="busca"><span class="eyebrow">/</span><input id="busca" placeholder="Buscar"></div>
+      </div>
+      <div class="quadro" id="quadro"></div>
+    </header>
+    <div id="captura-wrap"></div>
+    <div class="rolagem" id="rolagem"></div>
+  </div>
+
+  <aside class="detalhe" id="detalhe"></aside>
+</div>
+
+<nav class="tabbar" id="tabbar"></nav>
+<div id="imprimivel"></div>
+<div class="modal" id="modal" hidden></div>
+<input type="file" id="arq-input" multiple hidden>
+<input type="file" id="imp-input" accept="application/json" hidden>
+
+<script>
+/* =========================================================================
+   CAMADA DE DADOS — trocar só este bloco para migrar para Supabase depois.
+   Guarda metadados em IndexedDB e os arquivos como Blob no mesmo banco.
+   ========================================================================= */
+const DB = (() => {
+  const NOME = "estacao", VER = 1;
+  const LOJAS = ["tarefas","notas","arquivos","blobs","meta"];
+  let db = null, memoria = null;
+
+  function abrir(){
+    return new Promise((ok,falha)=>{
+      let req;
+      try{ req = indexedDB.open(NOME,VER); }catch(e){ return falha(e); }
+      req.onupgradeneeded = () => {
+        const d = req.result;
+        LOJAS.forEach(l => { if(!d.objectStoreNames.contains(l)) d.createObjectStore(l,{keyPath:"id"}); });
+      };
+      req.onsuccess = () => ok(req.result);
+      req.onerror = () => falha(req.error);
+      req.onblocked = () => falha(new Error("bloqueado"));
+    });
+  }
+  async function iniciar(){
+    try{
+      db = await abrir();
+      return {ok:true};
+    }catch(e){
+      memoria = {}; LOJAS.forEach(l => memoria[l] = new Map());
+      return {ok:false, erro:e};
+    }
+  }
+  function tx(loja,modo){ return db.transaction(loja,modo).objectStore(loja); }
+  function P(req){ return new Promise((ok,falha)=>{ req.onsuccess=()=>ok(req.result); req.onerror=()=>falha(req.error); }); }
+
+  return {
+    iniciar,
+    emMemoria: () => !!memoria,
+    async todos(loja){
+      const l = memoria ? [...memoria[loja].values()] : await P(tx(loja,"readonly").getAll());
+      return l.filter(o=>!o._del);
+    },
+    // Inclui as lápides (registros apagados) — usado só pela sincronização.
+    async todosBrutos(loja){
+      return memoria ? [...memoria[loja].values()] : P(tx(loja,"readonly").getAll());
+    },
+    async pegar(loja,id){
+      if(memoria) return memoria[loja].get(id);
+      return P(tx(loja,"readonly").get(id));
+    },
+    async salvar(loja,obj,daNuvem){
+      if(SINCRONIZAVEIS.includes(loja) && !daNuvem){ obj._p = 1; obj._at = Date.now(); agendarSync(); }
+      if(memoria){ memoria[loja].set(obj.id,obj); return obj; }
+      await P(tx(loja,"readwrite").put(obj)); return obj;
+    },
+    async remover(loja,id,daNuvem){
+      // Apagar de vez impediria o outro aparelho de saber da remoção: grava lápide.
+      if(SINCRONIZAVEIS.includes(loja) && !daNuvem) return this.salvar(loja,{id,_del:1});
+      if(memoria){ memoria[loja].delete(id); return; }
+      await P(tx(loja,"readwrite").delete(id));
+    },
+    async limpar(loja){
+      if(memoria){ memoria[loja].clear(); return; }
+      await P(tx(loja,"readwrite").clear());
+    }
+  };
+})();
+
+/* =========================================================================
+   NUVEM — sincroniza notebook e celular via Supabase.
+   Tudo continua funcionando offline: a nuvem é um espelho, não a fonte.
+   Estratégia: uma tabela só (itens), última escrita vence, lápides para
+   remoções, arquivos no Storage baixados sob demanda.
+   ========================================================================= */
+const SINCRONIZAVEIS = ["tarefas","notas","arquivos","meta"];
+let tmrSync = null;
+function agendarSync(){
+  clearTimeout(tmrSync);
+  tmrSync = setTimeout(()=>{
+    if(S.notaAberta) return agendarSync();      // não interrompe quem está escrevendo
+    Nuvem.sincronizar();
+  }, 4000);
+}
+
+const Nuvem = {
+  cli:null, usuario:null, url:null, chave:null, worker:null,
+  estado:"local", ultimo:"1970-01-01T00:00:00Z", ocupado:false, erro:null, quando:null,
+
+  guardar(k,v){ try{ localStorage.setItem(k,v); }catch{} },
+  ler(k){ try{ return localStorage.getItem(k); }catch{ return null; } },
+
+  async iniciar(){
+    this.url = this.ler("estacao-url");
+    this.chave = this.ler("estacao-chave");
+    this.worker = (this.ler("estacao-worker")||"").replace(/\/$/,"");
+    this.ultimo = this.ler("estacao-ultimo") || this.ultimo;
+    if(!this.url || !this.chave) return;
+    if(!window.supabase){ this.erro = "biblioteca não carregou (sem internet?)"; return; }
+    this.cli = window.supabase.createClient(this.url,this.chave);
+    const {data} = await this.cli.auth.getSession();
+    this.usuario = data?.session?.user || null;
+    this.estado = this.usuario ? "conectado" : "deslogado";
+    this.cli.auth.onAuthStateChange(async (_ev,sess)=>{
+      this.usuario = sess?.user || null;
+      this.estado = this.usuario ? "conectado" : "deslogado";
+      render();
+      if(this.usuario) await this.sincronizar();
+    });
+    if(this.usuario) await this.sincronizar();
+  },
+
+  async configurar(){
+    const url = await perguntar("Endereço do projeto Supabase","https://xxxxx.supabase.co",this.url||"");
+    if(!url) return;
+    const chave = await perguntar("Chave anon public do projeto","cole a chave aqui",this.chave||"");
+    if(!chave) return;
+    const worker = await perguntar("Endereço do Worker dos arquivos",
+      "deixe em branco para usar o Supabase Storage", this.worker||"");
+    this.guardar("estacao-url",url.trim());
+    this.guardar("estacao-chave",chave.trim());
+    this.guardar("estacao-worker",(worker||"").trim().replace(/\/$/,""));
+    location.reload();
+  },
+  async entrar(){
+    if(!this.cli) return this.configurar();
+    await this.cli.auth.signInWithOAuth({
+      provider:"google",
+      options:{redirectTo: location.href.split("#")[0].split("?")[0]}
+    });
+  },
+  async sair(){
+    if(!this.cli) return;
+    await this.cli.auth.signOut();
+    this.usuario = null; this.estado = "deslogado"; render();
+  },
+  async desconectar(){
+    if(!await confirmar("Desconectar este aparelho?","Os dados locais continuam aqui.","Desconectar")) return;
+    ["estacao-url","estacao-chave","estacao-ultimo"].forEach(k=>{ try{ localStorage.removeItem(k); }catch{} });
+    location.reload();
+  },
+
+  async sincronizar(){
+    if(!this.cli || !this.usuario || this.ocupado) return;
+    this.ocupado = true; this.erro = null; renderConta();
+    try{
+      await this.enviar();
+      await this.receber();
+      await this.enviarBlobs();
+      this.quando = Date.now();
+    }catch(e){
+      this.erro = (e && (e.message || e.error_description)) || String(e);
+    }
+    this.ocupado = false;
+    await carregar();
+    render();
+  },
+
+  async enviar(){
+    const linhas = [], marcados = [];
+    for(const loja of SINCRONIZAVEIS){
+      for(const o of await DB.todosBrutos(loja)){
+        if(!o._p) continue;
+        const copia = Object.assign({},o); delete copia._p;
+        linhas.push({id: loja+":"+o.id, usuario:this.usuario.id, tipo:loja,
+                     dados:copia, apagado: !!o._del, atualizado_em:new Date().toISOString()});
+        marcados.push([loja,o]);
+      }
+    }
+    if(!linhas.length) return;
+    const {error} = await this.cli.from("itens").upsert(linhas,{onConflict:"id"});
+    if(error) throw error;
+    for(const [loja,o] of marcados){ delete o._p; await DB.salvar(loja,o,true); }
+  },
+
+  async receber(){
+    const {data,error} = await this.cli.from("itens")
+      .select("tipo,dados,atualizado_em").gt("atualizado_em",this.ultimo).order("atualizado_em");
+    if(error) throw error;
+    let maior = this.ultimo;
+    for(const l of data||[]){
+      if(l.atualizado_em > maior) maior = l.atualizado_em;
+      if(!l.dados || !l.dados.id) continue;
+      const local = await DB.pegar(l.tipo,l.dados.id);
+      if(local && local._p) continue;                  // mudança local ainda não enviada vence
+      await DB.salvar(l.tipo,l.dados,true);
+    }
+    if(maior !== this.ultimo){ this.ultimo = maior; this.guardar("estacao-ultimo",maior); }
+  },
+
+  async token(){
+    const {data} = await this.cli.auth.getSession();
+    return data?.session?.access_token || null;
+  },
+
+  async enviarBlobs(){
+    for(const a of await DB.todos("arquivos")){
+      if(!a._up) continue;
+      const b = await DB.pegar("blobs",a.id);
+      if(!b){ delete a._up; await DB.salvar("arquivos",a,true); continue; }
+      if(this.worker){
+        const r = await fetch(this.worker+"/arquivo/"+a.id,{
+          method:"PUT",
+          headers:{Authorization:"Bearer "+await this.token(),
+                   "Content-Type":a.tipo||"application/octet-stream"},
+          body:b.blob
+        });
+        if(!r.ok) throw new Error("envio de "+a.nome+" falhou ("+r.status+")");
+      } else {
+        const {error} = await this.cli.storage.from("arquivos")
+          .upload(this.usuario.id+"/"+a.id, b.blob, {upsert:true, contentType:a.tipo||"application/octet-stream"});
+        if(error) throw error;
+      }
+      delete a._up; await DB.salvar("arquivos",a,true);
+    }
+  },
+
+  async baixarBlob(id){
+    if(!this.cli || !this.usuario) return null;
+    try{
+      let blob = null;
+      if(this.worker){
+        const r = await fetch(this.worker+"/arquivo/"+id,{headers:{Authorization:"Bearer "+await this.token()}});
+        if(!r.ok) return null;
+        blob = await r.blob();
+      } else {
+        const {data,error} = await this.cli.storage.from("arquivos").download(this.usuario.id+"/"+id);
+        if(error || !data) return null;
+        blob = data;
+      }
+      await DB.salvar("blobs",{id,blob});
+      return blob;
+    }catch{ return null; }
+  },
+
+  // Chamado quando você exclui um arquivo, para não deixar lixo ocupando cota.
+  async apagarBlob(id){
+    if(!this.cli || !this.usuario) return;
+    try{
+      if(this.worker){
+        await fetch(this.worker+"/arquivo/"+id,{method:"DELETE",
+          headers:{Authorization:"Bearer "+await this.token()}});
+      } else {
+        await this.cli.storage.from("arquivos").remove([this.usuario.id+"/"+id]);
+      }
+    }catch{}
+  }
+};
+
+function renderConta(){
+  const el = document.getElementById("conta");
+  if(!el) return;
+  const linha = (txt,cor) => `<div class="eyebrow" style="margin-bottom:6px;${cor?`color:${cor}`:""}">${txt}</div>`;
+  if(Nuvem.estado === "local"){
+    el.innerHTML = linha("Só neste aparelho")
+      + `<button class="btn-min" id="c-config">Conectar conta</button>`;
+    el.querySelector("#c-config").onclick = () => Nuvem.configurar();
+    return;
+  }
+  if(Nuvem.estado === "deslogado"){
+    el.innerHTML = linha("Projeto configurado")
+      + `<button class="btn-min" id="c-entrar">Entrar com Google</button>
+         <button class="btn-min" id="c-desconectar">Remover</button>`;
+    el.querySelector("#c-entrar").onclick = () => Nuvem.entrar();
+    el.querySelector("#c-desconectar").onclick = () => Nuvem.desconectar();
+    return;
+  }
+  const quando = Nuvem.ocupado ? "sincronizando…"
+    : Nuvem.erro ? "erro ao sincronizar"
+    : Nuvem.quando ? "atualizado " + new Date(Nuvem.quando).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})
+    : "aguardando";
+  el.innerHTML = linha(esc((Nuvem.usuario?.email||"conectado").split("@")[0]))
+    + linha("arquivos: " + (Nuvem.worker ? "R2" : "Supabase"))
+    + linha(quando, Nuvem.erro ? "var(--t0)" : null)
+    + `<button class="btn-min" id="c-sync">Sincronizar</button>
+       <button class="btn-min" id="c-sair">Sair</button>`
+    + (Nuvem.erro ? `<div class="eyebrow" style="color:var(--t0);margin-top:6px;text-transform:none;letter-spacing:0">${esc(Nuvem.erro)}</div>` : "");
+  el.querySelector("#c-sync").onclick = () => Nuvem.sincronizar();
+  el.querySelector("#c-sair").onclick = () => Nuvem.sair();
+}
+
+/* =========================================================================
+   TRIAGEM — classificação de risco aplicada a prazo.
+   Prioridade e esforço deslocam a tarefa uma faixa para cima ou para baixo.
+   ========================================================================= */
+const FAIXAS = [
+  {id:0,nome:"Vermelho",desc:"vencida ou vence hoje",cor:"var(--t0)"},
+  {id:1,nome:"Laranja", desc:"muito urgente",        cor:"var(--t1)"},
+  {id:2,nome:"Amarelo", desc:"urgente",              cor:"var(--t2)"},
+  {id:3,nome:"Verde",   desc:"pouco urgente",        cor:"var(--t3)"},
+  {id:4,nome:"Azul",    desc:"sem prazo definido",   cor:"var(--t4)"}
+];
+const hojeISO = () => new Date().toISOString().slice(0,10);
+function diasAte(iso){
+  if(!iso) return null;
+  const a = new Date(iso+"T00:00:00"), b = new Date(hojeISO()+"T00:00:00");
+  return Math.round((a-b)/86400000);
+}
+function triagem(t){
+  if(t.feito) return {id:5,nome:"Concluída",desc:"",cor:"var(--t5)"};
+  const d = diasAte(t.prazo);
+  if(d === null) return FAIXAS[4];
+  let base = d < 0 ? 0 : d === 0 ? 1 : d <= 2 ? 2 : d <= 7 ? 3 : 4;
+  if(t.prioridade === "alta") base -= 1;
+  if(t.prioridade === "baixa") base += 1;
+  if(t.esforco === "longo" && d <= 7) base -= 1;
+  if(t.esforco === "curto" && d > 2) base += 1;
+  return FAIXAS[Math.max(0,Math.min(4,base))];
+}
+function prazoTexto(t){
+  const d = diasAte(t.prazo);
+  if(d === null) return "sem prazo";
+  if(d < 0) return `atrasada ${-d}d`;
+  if(d === 0) return "hoje";
+  if(d === 1) return "amanhã";
+  if(d <= 30) return `faltam ${d}d`;
+  return new Date(t.prazo+"T00:00:00").toLocaleDateString("pt-BR");
+}
+
+/* ========================= DIÁLOGOS =========================
+   Substituem confirm/prompt/alert do navegador, que ficam bloqueados dentro
+   de iframes restritos e devolvem "não" sem avisar ninguém.
+   ============================================================ */
+function dialogo(op){
+  return new Promise(resolve=>{
+    const m = document.getElementById("modal");
+    m.hidden = false;
+    m.innerHTML = `<div class="modal-cx" role="dialog" aria-modal="true">
+        <h3>${esc(op.titulo)}</h3>
+        ${op.texto ? `<p>${esc(op.texto)}</p>` : ""}
+        ${op.campo ? `<input class="ctrl" id="m-campo" placeholder="${esc(op.campo)}" value="${esc(op.valor||"")}">` : ""}
+        <div class="acoes">
+          ${op.soAviso ? "" : `<button class="btn" id="m-nao">Cancelar</button>`}
+          <button class="btn ${op.risco ? "btn-perigo" : "btn-forte"}" id="m-sim">${esc(op.ok||"Confirmar")}</button>
+        </div></div>`;
+    const campo = m.querySelector("#m-campo");
+    const vazio = op.campo ? null : false;
+    const cheio = () => op.campo ? (campo.value.trim() || null) : true;
+    const fechar2 = v => {
+      m.hidden = true; m.innerHTML = "";
+      document.removeEventListener("keydown", tecla, true);
+      resolve(v);
+    };
+    function tecla(e){
+      if(e.key === "Escape"){ e.preventDefault(); e.stopPropagation(); fechar2(vazio); }
+      if(e.key === "Enter" && (!campo || document.activeElement === campo)){
+        e.preventDefault(); e.stopPropagation(); fechar2(cheio());
+      }
+    }
+    document.addEventListener("keydown", tecla, true);
+    const nao = m.querySelector("#m-nao");
+    if(nao) nao.onclick = () => fechar2(vazio);
+    m.querySelector("#m-sim").onclick = () => fechar2(cheio());
+    m.onclick = e => { if(e.target === m) fechar2(vazio); };
+    (campo || m.querySelector("#m-sim")).focus();
+    if(campo) campo.select();
+  });
+}
+const confirmarExclusao = (titulo,texto) => dialogo({titulo,texto,ok:"Excluir",risco:true});
+const confirmar  = (titulo,texto,ok) => dialogo({titulo,texto,ok:ok||"Confirmar"});
+const perguntar  = (titulo,campo,valor) => dialogo({titulo,campo,valor,ok:"Salvar"});
+const avisar     = (titulo,texto) => dialogo({titulo,texto,ok:"Entendi",soAviso:true});
+
+/* ========================= ESTADO ========================= */
+const S = {
+  aba:"hoje", cat:null, pasta:null, tri:null, busca:"", notaAberta:null,
+  sel:null, selTipo:null,
+  tarefas:[], notas:[], arquivos:[],
+  meta:{id:"meta",categorias:["Faculdade","Monitoria","Pessoal"],pastas:["Faculdade","Monitoria","Pessoal"]}
+};
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const bytes = n => n < 1024 ? n+" B" : n < 1048576 ? (n/1024).toFixed(0)+" KB" : (n/1048576).toFixed(1)+" MB";
+
+async function carregar(){
+  S.tarefas  = await DB.todos("tarefas");
+  S.notas    = await DB.todos("notas");
+  S.arquivos = await DB.todos("arquivos");
+  const m = await DB.pegar("meta","meta");
+  if(m) S.meta = m; else await DB.salvar("meta",S.meta);
+}
+const salvarMeta = () => DB.salvar("meta",S.meta);
+
+/* ========================= NAVEGAÇÃO ========================= */
+const ICO = {
+  hoje:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  semana:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  tarefas:'<svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+  notas:'<svg viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5"/></svg>',
+  arquivos:'<svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/></svg>',
+  feitas:'<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>'
+};
+const ABAS = [
+  {id:"hoje",rot:"Hoje"},{id:"semana",rot:"Semana"},{id:"tarefas",rot:"Tarefas"},
+  {id:"notas",rot:"Notas"},{id:"arquivos",rot:"Arquivos"},{id:"feitas",rot:"Concluídas"}
+];
+function pendentes(){ return S.tarefas.filter(t=>!t.feito); }
+function contarAba(id){
+  const p = pendentes();
+  if(id==="hoje")   return p.filter(t=>t.prazo && diasAte(t.prazo)<=0).length;
+  if(id==="semana") return p.filter(t=>t.prazo && diasAte(t.prazo)<=7).length;
+  if(id==="tarefas")return p.length;
+  if(id==="notas")  return S.notas.length;
+  if(id==="arquivos")return S.arquivos.length;
+  return S.tarefas.filter(t=>t.feito).length;
+}
+function irPara(aba){ S.aba = aba; S.tri = null; S.cat = null; S.pasta = null; S.notaAberta = null; fechar(); render(); }
+
+/* ========================= RENDER ========================= */
+function render(){
+  document.getElementById("hoje-label").textContent =
+    new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"short"}).replace(".","");
+  renderNav(); renderRail(); renderTopo(); renderCaptura(); renderLista(); renderUso(); renderConta();
+}
+
+function renderNav(){
+  document.getElementById("nav").innerHTML = ABAS.map(a=>{
+    const c = contarAba(a.id);
+    return `<button class="nav-i" data-aba="${a.id}" aria-current="${S.aba===a.id}">
+      ${ICO[a.id]}<span>${a.rot}</span>${c?`<span class="cnt">${c}</span>`:""}</button>`;
+  }).join("");
+  document.getElementById("tabbar").innerHTML = ABAS.slice(0,5).map(a=>
+    `<button class="tab" data-aba="${a.id}" aria-current="${S.aba===a.id}">${ICO[a.id]}<span>${a.rot}</span></button>`
+  ).join("");
+  document.querySelectorAll("[data-aba]").forEach(b=>b.onclick=()=>irPara(b.dataset.aba));
+}
+
+function renderRail(){
+  const arq = S.aba === "arquivos";
+  document.getElementById("sec-tit").textContent = arq ? "Pastas" : "Categorias";
+  const lista = arq ? S.meta.pastas : S.meta.categorias;
+  const atual = arq ? S.pasta : S.cat;
+  const cont = n => arq ? S.arquivos.filter(a=>a.pasta===n).length
+                        : pendentes().filter(t=>t.categoria===n).length;
+  document.getElementById("sec-lista").innerHTML = lista.map(n=>
+    `<button class="chip-cat" data-cat="${esc(n)}" aria-current="${atual===n}">
+       <span>${esc(n)}</span><span class="cnt">${cont(n)||""}</span>
+     </button>`).join("") || `<div class="eyebrow" style="padding:6px 9px">nenhuma ainda</div>`;
+  document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{
+    const n = b.dataset.cat;
+    if(arq){ S.pasta = S.pasta===n ? null : n; }
+    else { S.cat = S.cat===n ? null : n; if(!["tarefas","hoje","semana","feitas"].includes(S.aba)) S.aba="tarefas"; }
+    render();
+  });
+}
+
+function renderTopo(){
+  const a = ABAS.find(x=>x.id===S.aba);
+  document.getElementById("titulo").textContent = a.rot;
+  const q = document.getElementById("quadro");
+  if(["notas","arquivos"].includes(S.aba)){ q.innerHTML=""; q.style.paddingBottom="14px"; return; }
+  const base = tarefasDaAba(true);
+  q.innerHTML = FAIXAS.map(f=>{
+    const n = base.filter(t=>triagem(t).id===f.id).length;
+    return `<button class="q-i ${n?"":"zero"}" data-tri="${f.id}" aria-pressed="${S.tri===f.id}"
+      title="${f.nome} — ${f.desc}"><span class="pt" style="background:${f.cor}"></span>${f.nome}<b class="mono">${n}</b></button>`;
+  }).join("");
+  document.querySelectorAll("[data-tri]").forEach(b=>b.onclick=()=>{
+    const v = +b.dataset.tri; S.tri = S.tri===v ? null : v; render();
+  });
+}
+
+function renderCaptura(){
+  const w = document.getElementById("captura-wrap");
+  if(S.aba === "notas" && S.notaAberta){ w.innerHTML = ""; return; }
+  if(["notas","arquivos"].includes(S.aba)){
+    w.innerHTML = `<div class="captura"><input id="cap" placeholder="${S.aba==="notas"?"Título da nota":"Nome da pasta"}"><button class="ent" id="cap-b">Criar</button></div>`;
+    document.getElementById("cap-b").onclick = criarDaCaptura;
+  } else {
+    w.innerHTML = `<div class="captura">
+      <input id="cap" placeholder="Nova tarefa — ex.: revisar semiologia 12/09 !alta #Monitoria">
+      <span class="dica">!alta &nbsp; #categoria &nbsp; 12/09 &nbsp; ~longo</span>
+      <button class="ent" id="cap-b">Enter</button></div>`;
+    document.getElementById("cap-b").onclick = criarDaCaptura;
+  }
+  const i = document.getElementById("cap");
+  i.onkeydown = e => { if(e.key==="Enter") criarDaCaptura(); };
+}
+
+function tarefasDaAba(ignorarTri){
+  let l = S.aba==="feitas" ? S.tarefas.filter(t=>t.feito) : pendentes();
+  if(S.aba==="hoje")   l = l.filter(t=>t.prazo && diasAte(t.prazo)<=0);
+  if(S.aba==="semana") l = l.filter(t=>t.prazo && diasAte(t.prazo)<=7);
+  if(S.cat) l = l.filter(t=>t.categoria===S.cat);
+  if(!ignorarTri && S.tri!==null) l = l.filter(t=>triagem(t).id===S.tri);
+  if(S.busca){
+    const b = S.busca.toLowerCase();
+    l = l.filter(t=>(t.titulo+" "+(t.obs||"")+" "+(t.categoria||"")).toLowerCase().includes(b));
+  }
+  return l.sort((x,y)=>{
+    const d = triagem(x).id - triagem(y).id; if(d) return d;
+    if(x.prazo && y.prazo && x.prazo!==y.prazo) return x.prazo < y.prazo ? -1 : 1;
+    if(x.prazo && !y.prazo) return -1;
+    if(!x.prazo && y.prazo) return 1;
+    return (y.criadoEm||0) - (x.criadoEm||0);
+  });
+}
+
+function renderLista(){
+  const r = document.getElementById("rolagem");
+  if(S.aba!=="notas" || !S.notaAberta) r.dataset.nota = "";
+  if(S.aba==="notas")    return S.notaAberta ? renderEditorNota(r) : renderNotas(r);
+  if(S.aba==="arquivos") return renderArquivos(r);
+
+  const l = tarefasDaAba();
+  if(!l.length){
+    r.innerHTML = `<div class="vazio"><div class="eyebrow">Nada aqui</div>
+      <p>${S.busca ? "Nenhuma tarefa corresponde à busca." :
+        S.aba==="hoje" ? "Nenhuma tarefa vence hoje. Escreva na linha acima para adicionar uma." :
+        S.aba==="feitas" ? "As tarefas concluídas ficam guardadas aqui, com a data." :
+        "Escreva na linha acima para adicionar a primeira tarefa."}</p></div>`;
+    return;
+  }
+  let html = "", faixaAtual = -1;
+  l.forEach(t=>{
+    const f = triagem(t);
+    if(f.id !== faixaAtual && S.aba!=="feitas"){
+      faixaAtual = f.id;
+      html += `<div class="grupo-tit"><span class="tri"><span class="pt" style="background:${f.cor}"></span>
+        <span class="eyebrow" style="color:var(--tx)">${f.nome}</span></span>
+        <span class="eyebrow">${f.desc}</span><hr></div>`;
+    }
+    const p = t.passos||[], ok = p.filter(x=>x.ok).length;
+    html += `<article class="item ${t.feito?"feito":""}" data-id="${t.id}"
+        style="border-left-color:${f.cor}" aria-selected="${S.sel===t.id}">
+      <button class="marca-ok" data-ok="${t.id}" aria-label="Concluir">
+        <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>
+      <div class="corpo">
+        <div class="tit">${esc(t.titulo)}</div>
+        <div class="meta">
+          <span>${t.feito ? "concluída " + new Date(t.concluidoEm).toLocaleDateString("pt-BR") : prazoTexto(t)}</span>
+          ${t.categoria?`<span class="tag-cat">${esc(t.categoria)}</span>`:""}
+          ${t.prioridade&&t.prioridade!=="media"?`<span>!${t.prioridade}</span>`:""}
+          ${p.length?`<span class="prog"><span class="prog-b"><i style="width:${ok/p.length*100}%"></i></span>${ok}/${p.length}</span>`:""}
+          ${(t.anexos||[]).length?`<span>${t.anexos.length} anexo${t.anexos.length>1?"s":""}</span>`:""}
+          ${t.adiamentos?`<span title="vezes adiada">adiada ${t.adiamentos}×</span>`:""}
+        </div>
+      </div></article>`;
+  });
+  r.innerHTML = html;
+  r.querySelectorAll(".item").forEach(el=>el.onclick=e=>{
+    if(e.target.closest("[data-ok]")) return;
+    abrirTarefa(el.dataset.id);
+  });
+  r.querySelectorAll("[data-ok]").forEach(b=>b.onclick=()=>alternarFeito(b.dataset.ok));
+}
+
+/* ========================= CAPTURA RÁPIDA ========================= */
+const DIAS_SEM = {dom:0,seg:1,ter:2,qua:3,qui:4,sex:5,sab:6,"sáb":6};
+function interpretar(txt){
+  const t = {id:uid(),titulo:"",categoria:S.cat||null,prazo:null,prioridade:"media",esforco:"medio",
+             passos:[],anexos:[],obs:"",feito:false,criadoEm:Date.now(),adiamentos:0};
+  let s = " "+txt+" ";
+  s = s.replace(/\s![aA]lta\b/,()=>{t.prioridade="alta";return " ";})
+       .replace(/\s![bB]aixa\b/,()=>{t.prioridade="baixa";return " ";})
+       .replace(/\s![mM]edia\b|\s![mM]édia\b/,()=>{t.prioridade="media";return " ";})
+       .replace(/\s~(curto|medio|médio|longo)\b/i,(_,v)=>{t.esforco=v.toLowerCase().startsWith("c")?"curto":v.toLowerCase().startsWith("l")?"longo":"medio";return " ";})
+       .replace(/\s#(\S+)/,(_,v)=>{
+          const achou = S.meta.categorias.find(c=>c.toLowerCase()===v.toLowerCase());
+          if(achou) t.categoria = achou;
+          else { t.categoria = v; S.meta.categorias.push(v); salvarMeta(); }
+          return " ";
+       });
+  const hj = new Date(hojeISO()+"T00:00:00");
+  const iso = d => d.toISOString().slice(0,10);
+  s = s.replace(/\shoje\b/i,()=>{t.prazo=iso(hj);return " ";});
+  if(!t.prazo) s = s.replace(/\samanh[ãa]\b/i,()=>{const d=new Date(hj);d.setDate(d.getDate()+1);t.prazo=iso(d);return " ";});
+  if(!t.prazo) s = s.replace(/\s(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/,(_,dd,mm,yy)=>{
+      const ano = yy ? (yy.length===2?2000+ +yy:+yy) : hj.getFullYear();
+      let d = new Date(ano,+mm-1,+dd);
+      if(!yy && d < hj) d = new Date(ano+1,+mm-1,+dd);
+      t.prazo = iso(d); return " ";
+  });
+  if(!t.prazo) s = s.replace(/\s(dom|seg|ter|qua|qui|sex|sab|sáb)\b/i,(_,v)=>{
+      const alvo = DIAS_SEM[v.toLowerCase()], d = new Date(hj);
+      let delta = (alvo - d.getDay() + 7) % 7; if(delta===0) delta = 7;
+      d.setDate(d.getDate()+delta); t.prazo = iso(d); return " ";
+  });
+  t.titulo = s.trim().replace(/\s+/g," ");
+  return t;
+}
+async function criarDaCaptura(){
+  const i = document.getElementById("cap");
+  const v = i.value.trim(); if(!v) return;
+  i.value = "";
+  if(S.aba === "arquivos"){
+    if(!S.meta.pastas.includes(v)){ S.meta.pastas.push(v); await salvarMeta(); }
+    render(); return;
+  }
+  if(S.aba === "notas"){
+    const n = {id:uid(),titulo:v,corpo:"",tags:[],criadoEm:Date.now(),atualizadoEm:Date.now()};
+    S.notas.unshift(n); await DB.salvar("notas",n); render(); abrirNota(n.id); return;
+  }
+  const t = interpretar(v);
+  if(!t.titulo) return;
+  S.tarefas.push(t); await DB.salvar("tarefas",t);
+  render();
+}
+
+/* ========================= AÇÕES DE TAREFA ========================= */
+async function alternarFeito(id){
+  const t = S.tarefas.find(x=>x.id===id); if(!t) return;
+  t.feito = !t.feito; t.concluidoEm = t.feito ? Date.now() : null;
+  await DB.salvar("tarefas",t); render(); if(S.sel===id) abrirTarefa(id);
+}
+async function atualizar(id,campos){
+  const t = S.tarefas.find(x=>x.id===id); if(!t) return;
+  Object.assign(t,campos); await DB.salvar("tarefas",t); render();
+}
+async function adiar(id,dias){
+  const t = S.tarefas.find(x=>x.id===id); if(!t) return;
+  const base = t.prazo ? new Date(t.prazo+"T00:00:00") : new Date(hojeISO()+"T00:00:00");
+  base.setDate(base.getDate()+dias);
+  t.prazo = base.toISOString().slice(0,10); t.adiamentos = (t.adiamentos||0)+1;
+  await DB.salvar("tarefas",t); render(); abrirTarefa(id);
+}
+
+/* ========================= PAINEL DE DETALHE ========================= */
+const painel = document.getElementById("detalhe");
+function fechar(){ S.sel=null; S.selTipo=null; document.getElementById("app").classList.remove("com-detalhe"); painel.innerHTML=""; render(); }
+function abrirPainel(html){
+  document.getElementById("app").classList.add("com-detalhe");
+  painel.innerHTML = html;
+  painel.querySelector("[data-fechar]").onclick = fechar;
+}
+
+// Atualiza só a faixa de triagem e o texto de prazo no topo do painel.
+function atualizarCabecalho(id){
+  const t = S.tarefas.find(x=>x.id===id); if(!t) return;
+  const f = triagem(t), topo = painel.querySelector(".det-topo");
+  if(!topo) return;
+  topo.querySelector(".pt").style.background = f.cor;
+  topo.querySelector(".tri .eyebrow").textContent = f.nome;
+  topo.querySelectorAll(".eyebrow")[1].textContent = prazoTexto(t);
+}
+
+function abrirTarefa(id){
+  const t = S.tarefas.find(x=>x.id===id); if(!t) return;
+  S.sel = id; S.selTipo = "tarefa";
+  const f = triagem(t), p = t.passos||[];
+  abrirPainel(`
+   <div class="det-topo">
+     <span class="tri"><span class="pt" style="background:${f.cor}"></span>
+       <span class="eyebrow" style="color:var(--tx)">${f.nome}</span></span>
+     <span class="eyebrow" style="margin-left:auto">${prazoTexto(t)}</span>
+     <button class="btn-min" data-fechar>Fechar</button>
+   </div>
+   <div class="det-corpo">
+     <textarea class="det-tit" id="d-tit" rows="2">${esc(t.titulo)}</textarea>
+     <div class="grade2">
+       <div class="campo"><span class="eyebrow">Prazo</span>
+         <input type="date" class="ctrl" id="d-prazo" value="${t.prazo||""}" min="2000-01-01" max="2100-12-31">
+         <div class="rapidos">
+           <button class="btn-min" data-praz="0">Hoje</button>
+           <button class="btn-min" data-praz="1">Amanhã</button>
+           <button class="btn-min" data-praz="7">+7d</button>
+           <button class="btn-min" data-praz="x">Limpar</button>
+         </div></div>
+       <label class="campo"><span class="eyebrow">Categoria</span>
+         <select class="ctrl" id="d-cat"><option value="">—</option>
+         ${S.meta.categorias.map(c=>`<option ${t.categoria===c?"selected":""}>${esc(c)}</option>`).join("")}
+         </select></label>
+       <label class="campo"><span class="eyebrow">Prioridade</span>
+         <select class="ctrl" id="d-pri">${["alta","media","baixa"].map(v=>`<option value="${v}" ${t.prioridade===v?"selected":""}>${v}</option>`).join("")}</select></label>
+       <label class="campo"><span class="eyebrow">Esforço</span>
+         <select class="ctrl" id="d-esf">${["curto","medio","longo"].map(v=>`<option value="${v}" ${t.esforco===v?"selected":""}>${v}</option>`).join("")}</select></label>
+     </div>
+
+     <div class="campo">
+       <span class="eyebrow">Passos ${p.length?`· ${p.filter(x=>x.ok).length} de ${p.length}`:""}</span>
+       <div id="d-passos">${p.map((s,i)=>`
+         <div class="passo ${s.ok?"ok":""}">
+           <button class="marca-ok" data-p="${i}" style="${s.ok?`background:var(--t3);border-color:var(--t3)`:""}">
+             <svg viewBox="0 0 24 24" style="opacity:${s.ok?1:0};stroke:var(--surf)"><path d="M4 12l5 5L20 6"/></svg></button>
+           <input type="text" value="${esc(s.t)}" data-pt="${i}">
+           <button class="x" data-px="${i}">×</button>
+         </div>`).join("")}</div>
+       <input class="ctrl" id="d-novo-passo" placeholder="Adicionar passo e Enter">
+     </div>
+
+     <div class="campo">
+       <span class="eyebrow">Arquivos desta tarefa</span>
+       <div id="d-anexos">${(t.anexos||[]).map(aid=>{
+          const a = S.arquivos.find(x=>x.id===aid); if(!a) return "";
+          return `<div class="anexo"><span class="ic">${esc((a.nome.split(".").pop()||"").slice(0,4).toUpperCase())}</span>
+            <span class="nm">${esc(a.nome)}</span>
+            <button class="btn-min" data-abrir="${a.id}">Abrir</button>
+            <button class="btn-min" data-desanexar="${a.id}">×</button></div>`;
+       }).join("") || `<div class="eyebrow" style="padding:4px 0">nenhum</div>`}</div>
+       <div style="display:flex;gap:6px;margin-top:6px">
+         <button class="btn" id="d-anexar-novo">Enviar arquivo</button>
+         <select class="ctrl" id="d-anexar-exist" style="flex:1">
+           <option value="">Anexar existente…</option>
+           ${S.arquivos.filter(a=>!(t.anexos||[]).includes(a.id)).map(a=>`<option value="${a.id}">${esc(a.nome)}</option>`).join("")}
+         </select>
+       </div>
+     </div>
+
+     <label class="campo"><span class="eyebrow">Observações</span>
+       <textarea class="ctrl" id="d-obs" placeholder="Contexto, links, o que precisa lembrar">${esc(t.obs||"")}</textarea></label>
+
+     <div class="acoes">
+       <button class="btn btn-forte" id="d-ok">${t.feito?"Reabrir":"Concluir"}</button>
+       <button class="btn" data-adiar="1">+1 dia</button>
+       <button class="btn" data-adiar="7">+1 semana</button>
+       <button class="btn btn-risco" id="d-del" style="margin-left:auto">Excluir</button>
+     </div>
+     ${t.adiamentos>1?`<div class="eyebrow" style="color:var(--t1)">Adiada ${t.adiamentos} vezes — talvez precise ser quebrada em passos menores.</div>`:""}
+   </div>`);
+
+  const g = s => painel.querySelector(s);
+  g("#d-tit").onblur   = e => atualizar(id,{titulo:e.target.value.trim()||"Sem título"});
+  // O prazo só é gravado quando o campo perde o foco. Gravar a cada "change"
+  // fazia o Chrome disparar com o ano ainda pela metade (2 -> ano 0002) e o
+  // painel se reconstruía no meio da digitação, roubando o cursor.
+  const prazoEl = g("#d-prazo");
+  const comitarPrazo = () => {
+    const v = prazoEl.value || null;
+    if((t.prazo||null) === v) return;
+    atualizar(id,{prazo:v}); atualizarCabecalho(id);
+  };
+  prazoEl.onblur = comitarPrazo;
+  prazoEl.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); prazoEl.blur(); } };
+  painel.querySelectorAll("[data-praz]").forEach(b=>b.onclick=()=>{
+    const v = b.dataset.praz;
+    if(v === "x"){ prazoEl.value = ""; }
+    else { const d = new Date(hojeISO()+"T00:00:00"); d.setDate(d.getDate()+ +v); prazoEl.value = d.toISOString().slice(0,10); }
+    comitarPrazo();
+  });
+  g("#d-cat").onchange = e => atualizar(id,{categoria:e.target.value||null});
+  g("#d-pri").onchange = e => { atualizar(id,{prioridade:e.target.value}); atualizarCabecalho(id); };
+  g("#d-esf").onchange = e => { atualizar(id,{esforco:e.target.value}); atualizarCabecalho(id); };
+  g("#d-obs").onblur   = e => atualizar(id,{obs:e.target.value});
+  g("#d-ok").onclick   = () => alternarFeito(id);
+  g("#d-del").onclick  = async () => {
+    if(!await confirmarExclusao("Excluir esta tarefa?","Os arquivos anexados a ela continuam guardados.")) return;
+    S.tarefas = S.tarefas.filter(x=>x.id!==id); await DB.remover("tarefas",id); fechar();
+  };
+  painel.querySelectorAll("[data-adiar]").forEach(b=>b.onclick=()=>adiar(id,+b.dataset.adiar));
+  g("#d-novo-passo").onkeydown = async e => {
+    if(e.key!=="Enter"||!e.target.value.trim()) return;
+    t.passos = [...(t.passos||[]),{t:e.target.value.trim(),ok:false}];
+    await DB.salvar("tarefas",t); render(); abrirTarefa(id);
+  };
+  painel.querySelectorAll("[data-p]").forEach(b=>b.onclick=async()=>{
+    t.passos[+b.dataset.p].ok = !t.passos[+b.dataset.p].ok;
+    await DB.salvar("tarefas",t); render(); abrirTarefa(id);
+  });
+  painel.querySelectorAll("[data-pt]").forEach(i=>i.onblur=async()=>{
+    t.passos[+i.dataset.pt].t = i.value; await DB.salvar("tarefas",t); render();
+  });
+  painel.querySelectorAll("[data-px]").forEach(b=>b.onclick=async()=>{
+    t.passos.splice(+b.dataset.px,1); await DB.salvar("tarefas",t); render(); abrirTarefa(id);
+  });
+  painel.querySelectorAll("[data-abrir]").forEach(b=>b.onclick=()=>abrirArquivo(b.dataset.abrir));
+  painel.querySelectorAll("[data-desanexar]").forEach(b=>b.onclick=async()=>{
+    t.anexos = t.anexos.filter(x=>x!==b.dataset.desanexar);
+    await DB.salvar("tarefas",t); render(); abrirTarefa(id);
+  });
+  g("#d-anexar-exist").onchange = async e => {
+    if(!e.target.value) return;
+    t.anexos = [...(t.anexos||[]),e.target.value];
+    await DB.salvar("tarefas",t); render(); abrirTarefa(id);
+  };
+  g("#d-anexar-novo").onclick = () => escolherArquivos(async ids=>{
+    t.anexos = [...(t.anexos||[]),...ids];
+    await DB.salvar("tarefas",t); render(); abrirTarefa(id);
+  });
+}
+
+/* ========================= NOTAS =========================
+   Editor em página cheia. O conteúdo é HTML editável (contenteditable);
+   imagens ficam no banco de blobs e só o atributo data-blob é gravado.
+   ========================================================= */
+const semTags = h => (h||"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
+const limpaNome = s => ((s||"nota").replace(/[\\/:*?"<>|]/g,"-").slice(0,60).trim() || "nota");
+
+function baixarBlob(blob,nome){
+  const u = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = u; a.download = nome; a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),5000);
+}
+
+// Notas da versão anterior guardavam markdown em .corpo — convertidas na primeira abertura.
+function migrarNota(n){
+  if(n.html !== undefined) return n;
+  const h = esc(n.corpo||"")
+    .replace(/^### (.+)$/gm,"<h3>$1</h3>")
+    .replace(/^## (.+)$/gm,"<h2>$1</h2>")
+    .replace(/^# (.+)$/gm,"<h2>$1</h2>")
+    .replace(/\*\*(.+?)\*\*/g,"<b>$1</b>")
+    .replace(/^[-•] (.+)$/gm,"<li>$1</li>")
+    .replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g,"<ul>$1</ul>")
+    .replace(/!\[img:([^\]]+)\]/g,'<img data-blob="$1">')
+    .split(/\n{2,}/)
+    .map(p => /^\s*<(h2|h3|ul|img)/.test(p) ? p : "<p>"+p.replace(/\n/g,"<br>")+"</p>")
+    .join("");
+  n.html = h; delete n.corpo;
+  return n;
+}
+
+function limparHtml(el){
+  const c = el.cloneNode(true);
+  c.querySelectorAll("img").forEach(i=>{ if(i.dataset.blob) i.removeAttribute("src"); });
+  // Mantém só o que é formatação de texto; o resto (cores e espaçamentos que
+  // vêm colados de fora) continua sendo descartado.
+  const MANTER = ["font-size","font-family","font-weight","font-style","text-decoration"];
+  c.querySelectorAll("[style]").forEach(i=>{
+    const guardar = MANTER
+      .map(p => i.style.getPropertyValue(p) ? p+":"+i.style.getPropertyValue(p) : "")
+      .filter(Boolean).join(";");
+    if(guardar) i.setAttribute("style",guardar); else i.removeAttribute("style");
+  });
+  return c.innerHTML;
+}
+async function restaurarImagens(el){
+  for(const img of el.querySelectorAll("img[data-blob]")){
+    let b = await DB.pegar("blobs", img.dataset.blob);
+    if(!b){
+      const baixado = await Nuvem.baixarBlob(img.dataset.blob);
+      if(baixado) b = {blob:baixado};
+    }
+    if(b) img.src = URL.createObjectURL(b.blob);
+    else img.replaceWith(document.createTextNode("[imagem ainda não sincronizada]"));
+  }
+}
+const esperarImagens = el => Promise.all([...el.querySelectorAll("img")]
+  .map(i => i.complete ? Promise.resolve() : new Promise(ok=>{ i.onload = i.onerror = ok; })));
+
+/* ---------- lista ---------- */
+function renderNotas(r){
+  r.dataset.nota = "";
+  const b = S.busca.toLowerCase();
+  const l = S.notas
+    .filter(n=>!b || (n.titulo+" "+semTags(n.html||n.corpo)).toLowerCase().includes(b))
+    .sort((x,y)=>y.atualizadoEm-x.atualizadoEm);
+  if(!l.length){
+    r.innerHTML = `<div class="vazio"><div class="eyebrow">Sem notas</div>
+      <p>Escreva um título na linha acima para começar. A nota abre em página cheia, com formatação, imagens e download em Word ou PDF.</p></div>`;
+    return;
+  }
+  r.innerHTML = l.map(n=>`<article class="item" data-n="${n.id}" style="border-left-color:var(--t4)">
+    <div class="corpo"><div class="tit">${esc(n.titulo)}</div>
+      <div class="meta"><span>${new Date(n.atualizadoEm).toLocaleDateString("pt-BR")}</span>
+      <span>${esc(semTags(n.html||n.corpo).slice(0,100)) || "vazia"}</span></div></div>
+    <button class="btn-min" data-ndel="${n.id}">Excluir</button></article>`).join("");
+  r.querySelectorAll("[data-n]").forEach(el=>el.onclick=e=>{
+    if(e.target.closest("[data-ndel]")) return;
+    abrirNota(el.dataset.n);
+  });
+  r.querySelectorAll("[data-ndel]").forEach(b=>b.onclick=()=>excluirNota(b.dataset.ndel));
+}
+
+async function excluirNota(id){
+  const n = S.notas.find(x=>x.id===id); if(!n) return;
+  if(!await confirmarExclusao(`Excluir “${n.titulo}”?`,"As imagens dela continuam na aba Arquivos.")) return;
+  S.notas = S.notas.filter(x=>x.id!==id);
+  await DB.remover("notas",id);
+  if(S.notaAberta === id) return fecharNota();
+  render();
+}
+
+function abrirNota(id){
+  S.notaAberta = id; S.sel = null; S.selTipo = null;
+  document.getElementById("app").classList.remove("com-detalhe");
+  painel.innerHTML = "";
+  render();
+}
+function fecharNota(){ S.notaAberta = null; render(); }
+
+/* ---------- editor ---------- */
+function renderEditorNota(r){
+  const n = S.notas.find(x=>x.id===S.notaAberta);
+  if(!n){ S.notaAberta = null; return renderNotas(r); }
+  if(r.dataset.nota === n.id) return;   // já montado — não remontar enquanto digita
+  migrarNota(n);
+  r.dataset.nota = n.id;
+
+  r.innerHTML = `<div class="ed">
+    <div class="ed-barra">
+      <button class="tb" id="n-voltar" title="Voltar para a lista">←</button>
+      <span class="sep"></span>
+      <button class="tb" data-cmd="h2" title="Título">H1</button>
+      <button class="tb" data-cmd="h3" title="Subtítulo">H2</button>
+      <button class="tb" data-cmd="bold" title="Negrito (Ctrl+B)"><b>B</b></button>
+      <button class="tb serif" data-cmd="italic" title="Itálico (Ctrl+I)"><i>I</i></button>
+      <span class="sep"></span>
+      <button class="tb" data-cmd="ul" title="Lista">•</button>
+      <button class="tb" data-cmd="ol" title="Lista numerada">1.</button>
+      <button class="tb serif" data-cmd="quote" title="Citação">”</button>
+      <button class="tb" data-cmd="hr" title="Linha separadora">—</button>
+      <button class="tb" id="n-img" title="Inserir imagem">▣</button>
+      <span class="sep"></span>
+      <select class="tb-sel" id="n-tam" title="Tamanho do texto selecionado">
+        <option value="">Tamanho</option>
+        <option value="12">12</option><option value="14">14</option>
+        <option value="16">16</option><option value="18">18</option>
+        <option value="20">20</option><option value="24">24</option>
+        <option value="28">28</option><option value="32">32</option>
+      </select>
+      <div class="menu">
+        <button class="btn-min" id="n-baixar">Baixar</button>
+        <div class="menu-lista" id="n-menu" hidden>
+          <button data-baixar="docx">Word (.docx)</button>
+          <button data-baixar="pdf">PDF</button>
+          <div class="nota-menu">O PDF sai pela janela de impressão — escolha “Salvar como PDF” no destino.</div>
+        </div>
+      </div>
+      <button class="btn-min btn-risco" id="n-lixo" title="Excluir esta nota">Excluir</button>
+    </div>
+    <textarea class="ed-tit" id="n-tit" rows="1" placeholder="Sem título">${esc(n.titulo)}</textarea>
+    <div class="ed-corpo" id="n-corpo" contenteditable="true" spellcheck="true"
+         data-vazio="Escreva aqui. Digite # e espaço para título, - e espaço para lista, > e espaço para citação. Cole imagens com Ctrl+V."></div>
+    <div class="ed-pe">
+      <span class="eyebrow" id="n-estado"></span>
+      <button class="btn btn-risco" id="n-del" style="margin-left:auto">Excluir nota</button>
+    </div>
+  </div>`;
+
+  const q = s => r.querySelector(s);
+  const tit = q("#n-tit"), corpo = q("#n-corpo"), estado = q("#n-estado"), menu = q("#n-menu");
+  corpo.innerHTML = n.html || "";
+  restaurarImagens(corpo);
+  const altura = () => { tit.style.height = "auto"; tit.style.height = tit.scrollHeight+"px"; };
+  altura();
+
+  let tmr = null;
+  const guardar = async () => {
+    clearTimeout(tmr);
+    n.titulo = tit.value.trim() || "Sem título";
+    n.html = limparHtml(corpo);
+    n.atualizadoEm = Date.now();
+    await DB.salvar("notas",n);
+    estado.textContent = "salvo";
+    setTimeout(()=>{ if(estado.textContent==="salvo") estado.textContent=""; },1500);
+  };
+  const agendar = () => { estado.textContent = "…"; clearTimeout(tmr); tmr = setTimeout(guardar,700); };
+
+  tit.oninput = () => { altura(); agendar(); };
+  tit.onkeydown = e => { if(e.key==="Enter"){ e.preventDefault(); corpo.focus(); } };
+  corpo.oninput = agendar;
+  corpo.onblur = guardar;
+
+  q("#n-voltar").onclick = async () => { await guardar(); fecharNota(); };
+  q("#n-del").onclick = () => excluirNota(n.id);
+  q("#n-lixo").onclick = () => excluirNota(n.id);
+
+  // Clicar no seletor tira o foco do texto e apaga a seleção — por isso ela é
+  // guardada antes e devolvida na hora de aplicar.
+  let selSalva = null;
+  const guardarSel = () => {
+    const sel = getSelection();
+    if(sel.rangeCount && corpo.contains(sel.anchorNode)) selSalva = sel.getRangeAt(0).cloneRange();
+  };
+  ["keyup","mouseup","focus"].forEach(ev=>corpo.addEventListener(ev,guardarSel));
+
+  function aplicarTamanho(px){
+    corpo.focus();
+    const sel = getSelection();
+    if(selSalva){ sel.removeAllRanges(); sel.addRange(selSalva); }
+    if(!sel.rangeCount) return;
+    if(sel.isCollapsed){
+      // Nada selecionado: aplica no parágrafo onde o cursor está.
+      let bloco = sel.anchorNode;
+      if(bloco && bloco.nodeType === 3) bloco = bloco.parentNode;
+      while(bloco && bloco !== corpo && bloco.parentNode !== corpo) bloco = bloco.parentNode;
+      if(!bloco || bloco === corpo) return;
+      const faixa = document.createRange();
+      faixa.selectNodeContents(bloco);
+      sel.removeAllRanges(); sel.addRange(faixa);
+    }
+    document.execCommand("styleWithCSS", false, false);
+    document.execCommand("fontSize", false, "7");
+    corpo.querySelectorAll('font[size="7"]').forEach(f=>{
+      const sp = document.createElement("span");
+      sp.style.fontSize = px + "px";
+      while(f.firstChild) sp.appendChild(f.firstChild);
+      f.replaceWith(sp);
+    });
+    selSalva = null;
+    agendar();
+  }
+  const selTam = q("#n-tam");
+  selTam.onmousedown = guardarSel;
+  selTam.onchange = () => { if(selTam.value){ aplicarTamanho(+selTam.value); selTam.value = ""; } };
+
+  // barra de formatação — onmousedown para não perder a seleção do texto
+  r.querySelectorAll("[data-cmd]").forEach(b=>b.onmousedown=e=>{
+    e.preventDefault(); corpo.focus();
+    const c = b.dataset.cmd;
+    if(c==="h2"||c==="h3") document.execCommand("formatBlock",false,c);
+    else if(c==="ul") document.execCommand("insertUnorderedList");
+    else if(c==="ol") document.execCommand("insertOrderedList");
+    else if(c==="quote") document.execCommand("formatBlock",false,"blockquote");
+    else if(c==="hr") document.execCommand("insertHorizontalRule");
+    else document.execCommand(c);
+    agendar();
+  });
+
+  // atalhos de markdown no espaço
+  const ATALHOS = {"#":["formatBlock","h2"],"##":["formatBlock","h3"],"###":["formatBlock","h3"],
+                   "-":["insertUnorderedList"],"*":["insertUnorderedList"],"1.":["insertOrderedList"],
+                   ">":["formatBlock","blockquote"]};
+  corpo.addEventListener("keydown", e => {
+    if(e.key !== " ") return;
+    const sel = getSelection(); if(!sel.rangeCount) return;
+    const alvo = sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentNode : sel.anchorNode;
+    const a = ATALHOS[(alvo.textContent||"").trim()];
+    if(!a || alvo === corpo && corpo.childNodes.length > 1) return;
+    e.preventDefault();
+    if(alvo.firstChild && alvo.firstChild.nodeType === 3) alvo.firstChild.textContent = "";
+    else alvo.textContent = "";
+    document.execCommand(a[0], false, a[1]);
+    agendar();
+  });
+
+  async function inserirImagem(arquivo){
+    const id2 = uid();
+    await DB.salvar("blobs",{id:id2,blob:arquivo});
+    const meta = {id:id2, nome:arquivo.name || ("imagem-"+id2+".png"), pasta:"Imagens de notas",
+                  tipo:arquivo.type, tamanho:arquivo.size, criadoEm:Date.now(), tags:["nota"], _up:1};
+    S.arquivos.push(meta); await DB.salvar("arquivos",meta);
+    if(!S.meta.pastas.includes("Imagens de notas")){ S.meta.pastas.push("Imagens de notas"); await salvarMeta(); }
+    corpo.focus();
+    document.execCommand("insertHTML", false,
+      `<img data-blob="${id2}" src="${URL.createObjectURL(arquivo)}"><p><br></p>`);
+    guardar();
+  }
+  q("#n-img").onclick = () => {
+    const i = document.createElement("input");
+    i.type = "file"; i.accept = "image/*";
+    i.onchange = () => { if(i.files[0]) inserirImagem(i.files[0]); };
+    i.click();
+  };
+  corpo.addEventListener("paste", e => {
+    const img = [...(e.clipboardData?.items||[])].find(x=>x.type.startsWith("image/"));
+    if(img){ e.preventDefault(); inserirImagem(img.getAsFile()); return; }
+    e.preventDefault();
+    document.execCommand("insertText", false, e.clipboardData.getData("text/plain"));
+    agendar();
+  });
+
+  q("#n-baixar").onclick = e => { e.stopPropagation(); menu.hidden = !menu.hidden; };
+  r.onclick = e => { if(!e.target.closest(".menu")) menu.hidden = true; };
+  r.querySelectorAll("[data-baixar]").forEach(b=>b.onclick=async()=>{
+    menu.hidden = true;
+    await guardar();
+    if(b.dataset.baixar === "pdf") imprimirNota(n,corpo);
+    else baixarDocx(n,corpo);
+  });
+}
+
+/* ---------- PDF: usa a janela de impressão do navegador ---------- */
+async function imprimirNota(n,corpo){
+  const alvo = document.getElementById("imprimivel");
+  alvo.innerHTML = `<h1>${esc(n.titulo)}</h1><div class="data">${new Date(n.atualizadoEm).toLocaleDateString("pt-BR")}</div>` + corpo.innerHTML;
+  await esperarImagens(alvo);
+  window.print();
+  setTimeout(()=>{ alvo.innerHTML = ""; },1500);
+}
+
+/* ---------- Word: .docx gerado na mão, sem biblioteca ---------- */
+const TABELA_CRC = (()=>{
+  const t = new Uint32Array(256);
+  for(let i=0;i<256;i++){ let c=i; for(let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[i]=c>>>0; }
+  return t;
+})();
+function crc32(bytes){
+  let c = 0xFFFFFFFF;
+  for(let i=0;i<bytes.length;i++) c = TABELA_CRC[(c ^ bytes[i]) & 0xFF] ^ (c>>>8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+// ZIP sem compressão (método "store") — suficiente para o Word abrir.
+function zipar(arquivos){
+  const enc = new TextEncoder(), partes = [], central = [];
+  let desloc = 0;
+  for(const f of arquivos){
+    const nome = enc.encode(f.nome), c = crc32(f.dados), n = f.dados.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true); lh.setUint16(4,20,true); lh.setUint16(6,0,true);
+    lh.setUint16(8,0,true); lh.setUint16(10,0,true); lh.setUint16(12,0,true);
+    lh.setUint32(14,c,true); lh.setUint32(18,n,true); lh.setUint32(22,n,true);
+    lh.setUint16(26,nome.length,true); lh.setUint16(28,0,true);
+    partes.push(new Uint8Array(lh.buffer), nome, f.dados);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true); ch.setUint16(4,20,true); ch.setUint16(6,20,true);
+    ch.setUint16(8,0,true); ch.setUint16(10,0,true); ch.setUint16(12,0,true); ch.setUint16(14,0,true);
+    ch.setUint32(16,c,true); ch.setUint32(20,n,true); ch.setUint32(24,n,true);
+    ch.setUint16(28,nome.length,true); ch.setUint16(30,0,true); ch.setUint16(32,0,true);
+    ch.setUint16(34,0,true); ch.setUint16(36,0,true); ch.setUint32(38,0,true); ch.setUint32(42,desloc,true);
+    central.push(new Uint8Array(ch.buffer), nome);
+    desloc += 30 + nome.length + n;
+  }
+  const tamCentral = central.reduce((s,p)=>s+p.length,0);
+  const fim = new DataView(new ArrayBuffer(22));
+  fim.setUint32(0,0x06054b50,true); fim.setUint16(4,0,true); fim.setUint16(6,0,true);
+  fim.setUint16(8,arquivos.length,true); fim.setUint16(10,arquivos.length,true);
+  fim.setUint32(12,tamCentral,true); fim.setUint32(16,desloc,true); fim.setUint16(20,0,true);
+  return new Blob([...partes,...central,new Uint8Array(fim.buffer)],
+    {type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+}
+const xmlEsc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+function wPar(conteudo,o){
+  o = o || {};
+  const ppr = `<w:pPr><w:spacing w:before="${o.antes||0}" w:after="${o.depois||120}" w:line="288" w:lineRule="auto"/>`
+            + (o.recuo?`<w:ind w:left="${o.recuo}"/>`:"") + `</w:pPr>`;
+  return `<w:p>${ppr}${conteudo||""}</w:p>`;
+}
+function wCorridas(no,fmt){
+  fmt = fmt || {};
+  let out = "";
+  no.childNodes.forEach(c=>{
+    if(c.nodeType === 3){
+      if(!c.textContent) return;
+      const rpr = (fmt.b?"<w:b/>":"") + (fmt.i?"<w:i/>":"")
+        + (fmt.sz?`<w:sz w:val="${fmt.sz}"/><w:szCs w:val="${fmt.sz}"/>`:"")
+        + (fmt.cor?`<w:color w:val="${fmt.cor}"/>`:"");
+      out += `<w:r>${rpr?`<w:rPr>${rpr}</w:rPr>`:""}<w:t xml:space="preserve">${xmlEsc(c.textContent)}</w:t></w:r>`;
+    } else if(c.nodeType === 1){
+      const tag = c.tagName.toLowerCase();
+      if(tag === "br"){ out += "<w:r><w:br/></w:r>"; return; }
+      if(tag === "img") return;
+      const f = Object.assign({},fmt);
+      if(tag === "b" || tag === "strong") f.b = true;
+      if(tag === "i" || tag === "em") f.i = true;
+      // px -> meio-pontos: 16px = 12pt = 24 meio-pontos
+      const px = c.style && parseFloat(c.style.fontSize);
+      if(px) f.sz = Math.round(px * 1.5);
+      out += wCorridas(c,f);
+    }
+  });
+  return out;
+}
+async function wImagem(img,midia){
+  const id = img.dataset.blob;
+  if(!id) return "";
+  const b = await DB.pegar("blobs",id);
+  if(!b) return "";
+  const i = midia.length;
+  let ext = ((b.blob.type||"image/png").split("/")[1]||"png").toLowerCase();
+  if(ext === "jpg") ext = "jpeg";
+  midia.push({nome:`imagem${i+1}.${ext}`, dados:new Uint8Array(await b.blob.arrayBuffer())});
+  const rId = "rId" + (101+i), MAX = 5486400;      // 6 polegadas em EMU
+  let cx = (img.naturalWidth||600)*9525, cy = (img.naturalHeight||400)*9525;
+  if(cx > MAX){ cy = Math.round(cy*MAX/cx); cx = MAX; }
+  return `<w:p><w:pPr><w:spacing w:after="160"/></w:pPr><w:r><w:drawing>`
+   + `<wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/>`
+   + `<wp:docPr id="${i+1}" name="Imagem ${i+1}"/>`
+   + `<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">`
+   + `<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">`
+   + `<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">`
+   + `<pic:nvPicPr><pic:cNvPr id="${i+1}" name="Imagem ${i+1}"/><pic:cNvPicPr/></pic:nvPicPr>`
+   + `<pic:blipFill><a:blip r:embed="${rId}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>`
+   + `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm>`
+   + `<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>`
+   + `</a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+}
+async function wBlocos(raiz,midia){
+  let xml = "";
+  for(const no of [...raiz.childNodes]){
+    if(no.nodeType === 3){
+      const t = no.textContent.trim();
+      if(t) xml += wPar(`<w:r><w:t xml:space="preserve">${xmlEsc(t)}</w:t></w:r>`);
+      continue;
+    }
+    if(no.nodeType !== 1) continue;
+    const tag = no.tagName.toLowerCase();
+    if(tag === "img"){ xml += await wImagem(no,midia); continue; }
+    if(tag === "h2") xml += wPar(wCorridas(no,{b:true,sz:32}),{antes:280,depois:80});
+    else if(tag === "h3") xml += wPar(wCorridas(no,{b:true,sz:26}),{antes:220,depois:60});
+    else if(tag === "ul" || tag === "ol"){
+      [...no.children].forEach((li,k)=>{
+        const marca = tag === "ul" ? "•  " : (k+1)+".  ";
+        xml += wPar(`<w:r><w:t xml:space="preserve">${marca}</w:t></w:r>` + wCorridas(li,{}),{recuo:360,depois:60});
+      });
+    }
+    else if(tag === "blockquote") xml += wPar(wCorridas(no,{i:true,cor:"595959"}),{recuo:360});
+    else if(tag === "hr") xml += `<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="6" w:space="1" w:color="AAAAAA"/></w:pBdr></w:pPr></w:p>`;
+    else {
+      const texto = wCorridas(no,{});
+      if(texto.trim()) xml += wPar(texto);
+      for(const im of (no.querySelectorAll ? no.querySelectorAll("img") : [])) xml += await wImagem(im,midia);
+    }
+  }
+  return xml;
+}
+async function baixarDocx(n,corpo){
+  const midia = [];
+  const corpoXml = await wBlocos(corpo,midia);
+  const tituloXml = wPar(`<w:r><w:rPr><w:b/><w:sz w:val="44"/></w:rPr><w:t xml:space="preserve">${xmlEsc(n.titulo)}</w:t></w:r>`,{depois:240});
+  const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`
+   + `<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"`
+   + ` xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"`
+   + ` xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>`
+   + tituloXml + corpoXml
+   + `<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1418" w:right="1418" w:bottom="1418" w:left="1418"/></w:sectPr>`
+   + `</w:body></w:document>`;
+  const tipos = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`
+   + `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">`
+   + `<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>`
+   + `<Default Extension="xml" ContentType="application/xml"/>`
+   + `<Default Extension="png" ContentType="image/png"/><Default Extension="jpeg" ContentType="image/jpeg"/>`
+   + `<Default Extension="gif" ContentType="image/gif"/><Default Extension="webp" ContentType="image/webp"/>`
+   + `<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`;
+  const relsRaiz = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`
+   + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`
+   + `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
+  const relsDoc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`
+   + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`
+   + midia.map((m,i)=>`<Relationship Id="rId${101+i}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${m.nome}"/>`).join("")
+   + `</Relationships>`;
+  const enc = new TextEncoder();
+  baixarBlob(zipar([
+    {nome:"[Content_Types].xml", dados:enc.encode(tipos)},
+    {nome:"_rels/.rels", dados:enc.encode(relsRaiz)},
+    {nome:"word/document.xml", dados:enc.encode(doc)},
+    {nome:"word/_rels/document.xml.rels", dados:enc.encode(relsDoc)},
+    ...midia.map(m=>({nome:"word/media/"+m.nome, dados:m.dados}))
+  ]), limpaNome(n.titulo)+".docx");
+}
+
+/* ========================= ARQUIVOS ========================= */
+const entradaArq = document.getElementById("arq-input");
+let aoEscolher = null;
+function escolherArquivos(cb){ aoEscolher = cb; entradaArq.value=""; entradaArq.click(); }
+entradaArq.onchange = async () => {
+  const ids = await guardarArquivos([...entradaArq.files], S.pasta || "Sem pasta");
+  const cb = aoEscolher; aoEscolher = null;
+  render(); if(cb) cb(ids);
+};
+async function guardarArquivos(lista,pasta){
+  const ids = [];
+  for(const f of lista){
+    const id = uid();
+    await DB.salvar("blobs",{id,blob:f});
+    const meta = {id,nome:f.name,pasta,tipo:f.type||"",tamanho:f.size,criadoEm:Date.now(),tags:[],_up:1};
+    S.arquivos.push(meta); await DB.salvar("arquivos",meta);
+    ids.push(id);
+  }
+  if(pasta && !S.meta.pastas.includes(pasta)){ S.meta.pastas.push(pasta); await salvarMeta(); }
+  return ids;
+}
+async function abrirArquivo(id){
+  let b = await DB.pegar("blobs",id);
+  if(!b){
+    const baixado = await Nuvem.baixarBlob(id);
+    if(baixado) b = {blob:baixado};
+  }
+  if(!b) return avisar("Arquivo não está neste aparelho","Ele foi enviado por outro aparelho. Conecte a conta e sincronize para baixá-lo.");
+  const url = URL.createObjectURL(b.blob);
+  window.open(url,"_blank");
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+
+function renderArquivos(r){
+  const b = S.busca.toLowerCase();
+  let l = S.arquivos.filter(a=>!b || (a.nome+" "+(a.tags||[]).join(" ")).toLowerCase().includes(b));
+  if(S.pasta) l = l.filter(a=>a.pasta===S.pasta);
+  l.sort((x,y)=>y.criadoEm-x.criadoEm);
+  r.innerHTML = `<div class="solta" id="solta">
+      Arraste arquivos aqui, ou <button class="btn-min" id="b-env">escolha do aparelho</button>
+      <div class="eyebrow" style="margin-top:6px">vão para ${S.pasta?`a pasta ${esc(S.pasta)}`:"“Sem pasta”"}</div>
+    </div>` + (l.length ? l.map(a=>`
+    <div class="arq" data-a="${a.id}">
+      <span class="ic">${esc((a.nome.split(".").pop()||"?").slice(0,4).toUpperCase())}</span>
+      <div class="corpo"><div class="tit" style="font-size:13px">${esc(a.nome)}</div>
+        <div class="meta"><span>${bytes(a.tamanho)}</span><span class="tag-cat">${esc(a.pasta)}</span>
+        <span>${new Date(a.criadoEm).toLocaleDateString("pt-BR")}</span>
+        ${usadoEm(a.id)?`<span>ligado a ${usadoEm(a.id)} tarefa(s)</span>`:""}</div></div>
+      <button class="btn-min" data-mover="${a.id}">Mover</button>
+      <button class="btn-min" data-del-a="${a.id}">Excluir</button>
+    </div>`).join("")
+    : `<div class="vazio"><div class="eyebrow">Pasta vazia</div>
+       <p>Só entra aqui o que você colocar. Nada é varrido do seu aparelho automaticamente.</p></div>`);
+
+  r.querySelector("#b-env").onclick = () => escolherArquivos(null);
+  r.querySelectorAll("[data-a]").forEach(el=>el.onclick=e=>{
+    if(e.target.closest("button")) return; abrirArquivo(el.dataset.a);
+  });
+  r.querySelectorAll("[data-mover]").forEach(btn=>btn.onclick=async()=>{
+    const a = S.arquivos.find(x=>x.id===btn.dataset.mover);
+    const p = await perguntar("Mover para qual pasta?","nome da pasta",a.pasta); if(!p) return;
+    a.pasta = p; if(!S.meta.pastas.includes(p)){ S.meta.pastas.push(p); await salvarMeta(); }
+    await DB.salvar("arquivos",a); render();
+  });
+  r.querySelectorAll("[data-del-a]").forEach(btn=>btn.onclick=async()=>{
+    const id = btn.dataset.delA;
+    if(!await confirmarExclusao("Excluir este arquivo?","A exclusão é definitiva e vale para os dois aparelhos.")) return;
+    S.arquivos = S.arquivos.filter(x=>x.id!==id);
+    await DB.remover("arquivos",id); await DB.remover("blobs",id);
+    Nuvem.apagarBlob(id);
+    for(const t of S.tarefas){ if((t.anexos||[]).includes(id)){ t.anexos = t.anexos.filter(x=>x!==id); await DB.salvar("tarefas",t); } }
+    render();
+  });
+  const z = r.querySelector("#solta");
+  ["dragenter","dragover"].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.add("ativo")}));
+  ["dragleave","drop"].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.remove("ativo")}));
+  z.addEventListener("drop",async e=>{
+    if(!e.dataTransfer.files.length) return;
+    await guardarArquivos([...e.dataTransfer.files], S.pasta||"Sem pasta"); render();
+  });
+}
+const usadoEm = id => S.tarefas.filter(t=>(t.anexos||[]).includes(id)).length;
+
+/* ========================= EXPORTAR / IMPORTAR ========================= */
+const b64 = blob => new Promise(ok=>{ const r=new FileReader(); r.onload=()=>ok(r.result.split(",")[1]); r.readAsDataURL(blob); });
+async function exportar(){
+  const blobs = [];
+  for(const a of S.arquivos){
+    const b = await DB.pegar("blobs",a.id);
+    if(b) blobs.push({id:a.id,tipo:b.blob.type,dados:await b64(b.blob)});
+  }
+  const pacote = {versao:1,em:new Date().toISOString(),tarefas:S.tarefas,notas:S.notas,arquivos:S.arquivos,meta:S.meta,blobs};
+  const u = URL.createObjectURL(new Blob([JSON.stringify(pacote)],{type:"application/json"}));
+  const a = document.createElement("a");
+  a.href = u; a.download = `estacao-${hojeISO()}.json`; a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),5000);
+}
+document.getElementById("imp-input").onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  if(!await confirmar("Importar este backup?","Os itens do arquivo serão somados aos que já existem.","Importar")) return;
+  const p = JSON.parse(await f.text());
+  for(const t of p.tarefas||[]){ if(!S.tarefas.find(x=>x.id===t.id)){ S.tarefas.push(t); await DB.salvar("tarefas",t); } }
+  for(const n of p.notas||[]){ if(!S.notas.find(x=>x.id===n.id)){ S.notas.push(n); await DB.salvar("notas",n); } }
+  for(const a of p.arquivos||[]){ if(!S.arquivos.find(x=>x.id===a.id)){ S.arquivos.push(a); await DB.salvar("arquivos",a); } }
+  for(const b of p.blobs||[]){
+    const bin = atob(b.dados), arr = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+    await DB.salvar("blobs",{id:b.id,blob:new Blob([arr],{type:b.tipo})});
+  }
+  (p.meta?.categorias||[]).forEach(c=>{ if(!S.meta.categorias.includes(c)) S.meta.categorias.push(c); });
+  (p.meta?.pastas||[]).forEach(c=>{ if(!S.meta.pastas.includes(c)) S.meta.pastas.push(c); });
+  await salvarMeta(); render();
+  avisar("Backup importado","Os itens do arquivo já estão na sua lista.");
+};
+
+async function renderUso(){
+  const tx = document.getElementById("uso-tx"), b = document.getElementById("uso-b");
+  const total = S.arquivos.reduce((s,a)=>s+(a.tamanho||0),0);
+  tx.textContent = bytes(total);
+  const rot = document.getElementById("uso-rot");
+  if(rot) rot.title = S.persistente
+    ? "Armazenamento protegido: o navegador não vai descartar seus dados sozinho."
+    : "Sem garantia: o navegador pode descartar os dados se ficar sem espaço. Exporte de vez em quando.";
+  if(rot) rot.textContent = S.persistente ? "Armazenamento · protegido" : "Armazenamento · sem garantia";
+  try{
+    const e = await navigator.storage.estimate();
+    if(e.quota) b.style.width = Math.min(100,(e.usage/e.quota)*100)+"%";
+  }catch{}
+}
+
+/* ========================= LIGAÇÕES GERAIS ========================= */
+document.getElementById("busca").oninput = e => { S.busca = e.target.value; renderLista(); };
+document.getElementById("b-tema").onclick = () => {
+  const h = document.documentElement;
+  h.dataset.tema = h.dataset.tema === "escuro" ? "claro" : "escuro";
+  try{ localStorage.setItem("estacao-tema",h.dataset.tema); }catch{}
+};
+const FONTES = ["p","m","g","gg"];
+const NOME_FONTE = {p:"Aa pequena", m:"Aa média", g:"Aa grande", gg:"Aa enorme"};
+function aplicarFonte(nivel){
+  const h = document.documentElement;
+  if(nivel === "m") h.removeAttribute("data-fonte"); else h.dataset.fonte = nivel;
+  const b = document.getElementById("b-fonte");
+  if(b){ b.textContent = NOME_FONTE[nivel].slice(0,2) + (nivel==="p"?"−":nivel==="m"?"":nivel==="g"?"+":"++"); b.title = NOME_FONTE[nivel]; }
+  try{ localStorage.setItem("estacao-fonte",nivel); }catch{}
+}
+document.getElementById("b-fonte").onclick = () => {
+  const atual = document.documentElement.dataset.fonte || "m";
+  aplicarFonte(FONTES[(FONTES.indexOf(atual)+1) % FONTES.length]);
+};
+document.getElementById("b-exp").onclick = exportar;
+document.getElementById("b-imp").onclick = () => document.getElementById("imp-input").click();
+document.getElementById("sec-add").onclick = async () => {
+  const arq = S.aba === "arquivos";
+  const n = await perguntar(arq ? "Nova pasta" : "Nova categoria", arq ? "ex.: Provas" : "ex.: Estágio");
+  if(!n) return;
+  const l = arq ? S.meta.pastas : S.meta.categorias;
+  if(!l.includes(n)) l.push(n);
+  await salvarMeta(); render();
+};
+document.getElementById("b-menu").onclick = () => irPara(S.aba==="tarefas"?"hoje":"tarefas");
+
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && S.sel) return fechar();
+  // O corpo da nota é uma div editável, não um input — precisa entrar no teste,
+  // senão os atalhos engolem as letras enquanto você escreve.
+  const foco = document.activeElement;
+  const digitando = !foco || /INPUT|TEXTAREA|SELECT/.test(foco.tagName)
+                    || foco.isContentEditable || foco.closest("[contenteditable='true']");
+  if(digitando) return;
+  if(e.key === "/"){ e.preventDefault(); document.getElementById("busca").focus(); }
+  if(e.key === "n"){ e.preventDefault(); document.getElementById("cap")?.focus(); }
+});
+
+/* ========================= INÍCIO ========================= */
+(async () => {
+  try{ const t = localStorage.getItem("estacao-tema"); if(t) document.documentElement.dataset.tema = t; }catch{}
+  let nivel = "m";
+  try{ nivel = localStorage.getItem("estacao-fonte") || "m"; }catch{}
+  aplicarFonte(FONTES.includes(nivel) ? nivel : "m");
+  const r = await DB.iniciar();
+  // Sem isso, o navegador pode descartar os dados sozinho quando ficar sem espaço
+  // ou depois de semanas sem uso. Concedido, ele só some se você mandar apagar.
+  try{ S.persistente = await navigator.storage.persist(); }catch{ S.persistente = false; }
+  if(!r.ok){
+    const a = document.getElementById("aviso");
+    a.hidden = false;
+    a.innerHTML = `<b>Modo demonstração.</b> Este navegador bloqueou o armazenamento — nada será salvo ao recarregar. Abra o arquivo por um endereço http (GitHub Pages ou servidor local), não por file://.`;
+  }
+  await carregar();
+  render();
+  await Nuvem.iniciar();
+  render();
+  window.addEventListener("focus", ()=>{ if(!S.notaAberta) Nuvem.sincronizar(); });
+  setInterval(()=>{ if(!S.notaAberta) Nuvem.sincronizar(); }, 120000);
+})();
+</script>
+</body>
+</html>
