@@ -28,7 +28,7 @@
 [data-fonte="p"] {--tx-base:13px; --tx-nota:15px; --tx-h1:20px; --tx-notatit:30px}
 [data-fonte="g"] {--tx-base:16px; --tx-nota:20px; --tx-h1:24px; --tx-notatit:37px}
 [data-fonte="gg"]{--tx-base:18px; --tx-nota:23px; --tx-h1:27px; --tx-notatit:41px}
- 
+
 *{box-sizing:border-box;margin:0;padding:0}
 /* Qualquer display definido numa classe vence o hidden do HTML. Sem esta linha,
    a camada do diálogo e a tarja de aviso ficam visíveis mesmo escondidas. */
@@ -41,14 +41,14 @@ button{background:none;border:none;cursor:pointer}
 ::selection{background:var(--acc);color:var(--acc-tx)}
 .mono{font-family:var(--f-mono)}
 .eyebrow{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
- 
+
 /* ---------- estrutura ---------- */
 #app{display:grid;grid-template-columns:var(--rail) minmax(0,1fr) 0;height:100dvh;transition:grid-template-columns .18s ease}
 #app.com-detalhe{grid-template-columns:var(--rail) minmax(0,1fr) var(--det)}
 .rail{background:var(--surf);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
 .centro{display:flex;flex-direction:column;overflow:hidden;background:var(--ink)}
 .detalhe{background:var(--surf);border-left:1px solid var(--line);overflow-y:auto;overflow-x:hidden}
- 
+
 /* ---------- rail ---------- */
 .marca{padding:16px 16px 12px;display:flex;align-items:baseline;gap:8px;border-bottom:1px solid var(--line)}
 .marca b{font-size:16px;font-weight:700;letter-spacing:-.02em}
@@ -72,7 +72,7 @@ button{background:none;border:none;cursor:pointer}
 .pe-botoes{display:flex;gap:6px;flex-wrap:wrap}
 .btn-min{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:4px 7px;border:1px solid var(--line);border-radius:4px}
 .btn-min:hover{color:var(--tx);border-color:var(--mut)}
- 
+
 /* ---------- topo do centro ---------- */
 .topo{padding:16px 22px 0;display:flex;flex-direction:column;gap:12px;border-bottom:1px solid var(--line)}
 .topo h1{font-size:var(--tx-h1);font-weight:600;letter-spacing:-.02em}
@@ -86,7 +86,7 @@ button{background:none;border:none;cursor:pointer}
 .q-i[aria-pressed="true"]{border-color:var(--line);background:var(--surf);color:var(--tx)}
 .q-i .pt{width:7px;height:7px;border-radius:50%;flex:none}
 .q-i.zero{opacity:.4}
- 
+
 /* ---------- captura ---------- */
 .captura{margin:14px 22px 0;display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:10px 13px}
 .captura:focus-within{border-color:var(--mut)}
@@ -94,7 +94,7 @@ button{background:none;border:none;cursor:pointer}
 .captura input::placeholder{color:var(--mut)}
 .captura .dica{font-family:var(--f-mono);font-size:10px;color:var(--mut);white-space:nowrap}
 .captura .ent{background:var(--acc);color:var(--acc-tx);font-weight:600;font-size:12px;padding:5px 11px;border-radius:4px}
- 
+
 /* ---------- lista ---------- */
 .rolagem{flex:1;overflow-y:auto;padding:14px 22px 80px}
 .grupo-tit{display:flex;align-items:center;gap:10px;margin:18px 0 8px}
@@ -121,7 +121,7 @@ button{background:none;border:none;cursor:pointer}
 .prog-b i{display:block;height:100%;background:var(--mut)}
 .vazio{text-align:center;padding:64px 20px;color:var(--mut)}
 .vazio p{margin:8px auto 0;max-width:34ch;font-size:13px}
- 
+
 /* ---------- detalhe ---------- */
 .det-topo{position:sticky;top:0;background:var(--surf);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;gap:10px;z-index:2}
 .det-corpo{padding:16px 18px 60px;display:flex;flex-direction:column;gap:18px}
@@ -145,14 +145,14 @@ textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size
 .btn-forte{background:var(--acc);color:var(--acc-tx);border-color:var(--acc);font-weight:600}
 .btn-forte:hover{color:var(--acc-tx);opacity:.9}
 .btn-risco:hover{color:var(--t0);border-color:var(--t0)}
- 
+
 /* ---------- arquivos ---------- */
 .solta{border:1px dashed var(--line);border-radius:var(--r);padding:26px;text-align:center;color:var(--mut);margin-bottom:14px}
 .solta.ativo{border-color:var(--acc);color:var(--tx);background:var(--surf)}
 .arq{display:flex;align-items:center;gap:12px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:9px 12px;margin-bottom:5px;cursor:pointer}
 .arq:hover{border-color:var(--mut)}
 .ic{width:32px;height:32px;border-radius:5px;background:var(--surf2);display:grid;place-items:center;flex:none;font-family:var(--f-mono);font-size:9px;font-weight:700;color:var(--mut);letter-spacing:.02em}
- 
+
 /* ---------- editor de notas em página cheia ---------- */
 .ed{max-width:760px;margin:0 auto}
 .ed-barra{position:sticky;top:0;z-index:3;background:var(--ink);display:flex;align-items:center;gap:2px;padding:8px 0 9px;border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -181,7 +181,7 @@ textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size
 .ed-corpo hr{border:none;border-top:1px solid var(--line);margin:22px 0}
 .ed-pe{border-top:1px solid var(--line);margin-top:24px;padding:12px 0 60px;display:flex;gap:8px;align-items:center}
 .rapidos{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
- 
+
 /* ---------- impressão / PDF ---------- */
 #imprimivel{display:none}
 @media print{
@@ -196,7 +196,7 @@ textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size
   #imprimivel img{max-width:100%;page-break-inside:avoid}
   #imprimivel blockquote{border-left:2pt solid #999;padding-left:10pt;color:#444}
 }
- 
+
 /* ---------- diálogos próprios ---------- */
 .modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:rgba(5,9,12,.62);padding:20px}
 .modal-cx{background:var(--surf);border:1px solid var(--line);border-radius:8px;padding:20px;width:100%;max-width:420px;box-shadow:0 24px 70px rgba(0,0,0,.5)}
@@ -206,7 +206,7 @@ textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size
 .modal-cx .acoes{border-top:none;padding-top:0;margin-top:18px;justify-content:flex-end}
 .btn-perigo{background:var(--t0);border-color:var(--t0);color:#fff;font-weight:600}
 .btn-perigo:hover{color:#fff;opacity:.9}
- 
+
 /* ---------- avisos / mobile ---------- */
 .aviso{background:var(--t1);color:#12181C;padding:8px 22px;font-size:12px;font-weight:500;display:flex;gap:8px;align-items:center}
 .tabbar{display:none}
@@ -236,9 +236,9 @@ textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size
 </style>
 </head>
 <body>
- 
+
 <div id="aviso" class="aviso" hidden></div>
- 
+
 <div id="app">
   <aside class="rail">
     <div class="marca"><b>Estação</b><span class="eyebrow" id="hoje-label"></span></div>
@@ -260,7 +260,7 @@ textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size
       </div>
     </div>
   </aside>
- 
+
   <div class="centro">
     <header class="topo">
       <div class="topo-l1">
@@ -273,17 +273,17 @@ textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size
     <div id="captura-wrap"></div>
     <div class="rolagem" id="rolagem"></div>
   </div>
- 
+
   <aside class="detalhe" id="detalhe"></aside>
 </div>
- 
+
 <nav class="tabbar" id="tabbar"></nav>
 <div class="fundo-menu" id="fundo-menu"></div>
 <div id="imprimivel"></div>
 <div class="modal" id="modal" hidden></div>
 <input type="file" id="arq-input" multiple hidden>
 <input type="file" id="imp-input" accept="application/json" hidden>
- 
+
 <script>
 /* =========================================================================
    CAMADA DE DADOS — trocar só este bloco para migrar para Supabase depois.
@@ -293,7 +293,7 @@ const DB = (() => {
   const NOME = "estacao", VER = 1;
   const LOJAS = ["tarefas","notas","arquivos","blobs","meta"];
   let db = null, memoria = null;
- 
+
   function abrir(){
     return new Promise((ok,falha)=>{
       let req;
@@ -318,7 +318,7 @@ const DB = (() => {
   }
   function tx(loja,modo){ return db.transaction(loja,modo).objectStore(loja); }
   function P(req){ return new Promise((ok,falha)=>{ req.onsuccess=()=>ok(req.result); req.onerror=()=>falha(req.error); }); }
- 
+
   return {
     iniciar,
     emMemoria: () => !!memoria,
@@ -351,7 +351,7 @@ const DB = (() => {
     }
   };
 })();
- 
+
 /* =========================================================================
    NUVEM — sincroniza notebook e celular via Supabase.
    Tudo continua funcionando offline: a nuvem é um espelho, não a fonte.
@@ -367,14 +367,14 @@ function agendarSync(){
     Nuvem.sincronizar();
   }, 4000);
 }
- 
+
 const Nuvem = {
   cli:null, usuario:null, url:null, chave:null, worker:null,
   estado:"local", ultimo:"1970-01-01T00:00:00Z", ocupado:false, erro:null, quando:null,
- 
+
   guardar(k,v){ try{ localStorage.setItem(k,v); }catch{} },
   ler(k){ try{ return localStorage.getItem(k); }catch{ return null; } },
- 
+
   async iniciar(){
     this.url = this.ler("estacao-url");
     this.chave = this.ler("estacao-chave");
@@ -394,7 +394,7 @@ const Nuvem = {
     });
     if(this.usuario) await this.sincronizar();
   },
- 
+
   async configurar(){
     const url = await perguntar("Endereço do projeto Supabase","https://xxxxx.supabase.co",this.url||"");
     if(!url) return;
@@ -424,7 +424,7 @@ const Nuvem = {
     ["estacao-url","estacao-chave","estacao-ultimo"].forEach(k=>{ try{ localStorage.removeItem(k); }catch{} });
     location.reload();
   },
- 
+
   async sincronizar(){
     if(!this.cli || !this.usuario || this.ocupado) return;
     this.ocupado = true; this.erro = null; renderConta();
@@ -440,7 +440,7 @@ const Nuvem = {
     await carregar();
     render();
   },
- 
+
   async enviar(){
     const linhas = [], marcados = [];
     for(const loja of SINCRONIZAVEIS){
@@ -457,7 +457,7 @@ const Nuvem = {
     if(error) throw error;
     for(const [loja,o] of marcados){ delete o._p; await DB.salvar(loja,o,true); }
   },
- 
+
   async receber(){
     const {data,error} = await this.cli.from("itens")
       .select("tipo,dados,atualizado_em").gt("atualizado_em",this.ultimo).order("atualizado_em");
@@ -472,12 +472,12 @@ const Nuvem = {
     }
     if(maior !== this.ultimo){ this.ultimo = maior; this.guardar("estacao-ultimo",maior); }
   },
- 
+
   async token(){
     const {data} = await this.cli.auth.getSession();
     return data?.session?.access_token || null;
   },
- 
+
   async enviarBlobs(){
     for(const a of await DB.todos("arquivos")){
       if(!a._up) continue;
@@ -499,7 +499,7 @@ const Nuvem = {
       delete a._up; await DB.salvar("arquivos",a,true);
     }
   },
- 
+
   async baixarBlob(id){
     if(!this.cli || !this.usuario) return null;
     try{
@@ -517,7 +517,7 @@ const Nuvem = {
       return blob;
     }catch{ return null; }
   },
- 
+
   // Chamado quando você exclui um arquivo, para não deixar lixo ocupando cota.
   async apagarBlob(id){
     if(!this.cli || !this.usuario) return;
@@ -531,7 +531,7 @@ const Nuvem = {
     }catch{}
   }
 };
- 
+
 function renderConta(){
   const el = document.getElementById("conta");
   if(!el) return;
@@ -563,7 +563,7 @@ function renderConta(){
   el.querySelector("#c-sync").onclick = () => Nuvem.sincronizar();
   el.querySelector("#c-sair").onclick = () => Nuvem.sair();
 }
- 
+
 /* =========================================================================
    TRIAGEM — classificação de risco aplicada a prazo.
    Prioridade e esforço deslocam a tarefa uma faixa para cima ou para baixo.
@@ -601,7 +601,7 @@ function prazoTexto(t){
   if(d <= 30) return `faltam ${d}d`;
   return new Date(t.prazo+"T00:00:00").toLocaleDateString("pt-BR");
 }
- 
+
 /* ========================= DIÁLOGOS =========================
    Substituem confirm/prompt/alert do navegador, que ficam bloqueados dentro
    de iframes restritos e devolvem "não" sem avisar ninguém.
@@ -645,7 +645,7 @@ const confirmarExclusao = (titulo,texto) => dialogo({titulo,texto,ok:"Excluir",r
 const confirmar  = (titulo,texto,ok) => dialogo({titulo,texto,ok:ok||"Confirmar"});
 const perguntar  = (titulo,campo,valor) => dialogo({titulo,campo,valor,ok:"Salvar"});
 const avisar     = (titulo,texto) => dialogo({titulo,texto,ok:"Entendi",soAviso:true});
- 
+
 /* ========================= ESTADO ========================= */
 const S = {
   aba:"hoje", cat:null, pasta:null, tri:null, busca:"", notaAberta:null,
@@ -656,7 +656,7 @@ const S = {
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const bytes = n => n < 1024 ? n+" B" : n < 1048576 ? (n/1024).toFixed(0)+" KB" : (n/1048576).toFixed(1)+" MB";
- 
+
 async function carregar(){
   S.tarefas  = await DB.todos("tarefas");
   S.notas    = await DB.todos("notas");
@@ -665,7 +665,7 @@ async function carregar(){
   if(m) S.meta = m; else await DB.salvar("meta",S.meta);
 }
 const salvarMeta = () => DB.salvar("meta",S.meta);
- 
+
 /* ========================= NAVEGAÇÃO ========================= */
 const ICO = {
   hoje:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
@@ -692,14 +692,14 @@ function contarAba(id){
 function abrirMenu(){ document.querySelector(".rail").classList.add("aberta"); document.getElementById("fundo-menu").classList.add("aberta"); }
 function fecharMenu(){ document.querySelector(".rail").classList.remove("aberta"); document.getElementById("fundo-menu").classList.remove("aberta"); }
 function irPara(aba){ S.aba = aba; S.tri = null; S.cat = null; S.pasta = null; S.notaAberta = null; fecharMenu(); fechar(); render(); }
- 
+
 /* ========================= RENDER ========================= */
 function render(){
   document.getElementById("hoje-label").textContent =
     new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"short"}).replace(".","");
   renderNav(); renderRail(); renderTopo(); renderCaptura(); renderLista(); renderUso(); renderConta();
 }
- 
+
 function renderNav(){
   document.getElementById("nav").innerHTML = ABAS.map(a=>{
     const c = contarAba(a.id);
@@ -711,7 +711,7 @@ function renderNav(){
   ).join("");
   document.querySelectorAll("[data-aba]").forEach(b=>b.onclick=()=>irPara(b.dataset.aba));
 }
- 
+
 function renderRail(){
   const arq = S.aba === "arquivos";
   document.getElementById("sec-tit").textContent = arq ? "Pastas" : "Categorias";
@@ -730,7 +730,7 @@ function renderRail(){
     fecharMenu(); render();
   });
 }
- 
+
 function renderTopo(){
   const a = ABAS.find(x=>x.id===S.aba);
   document.getElementById("titulo").textContent = a.rot;
@@ -746,7 +746,7 @@ function renderTopo(){
     const v = +b.dataset.tri; S.tri = S.tri===v ? null : v; render();
   });
 }
- 
+
 function renderCaptura(){
   const w = document.getElementById("captura-wrap");
   if(S.aba === "notas" && S.notaAberta){ w.innerHTML = ""; return; }
@@ -763,7 +763,7 @@ function renderCaptura(){
   const i = document.getElementById("cap");
   i.onkeydown = e => { if(e.key==="Enter") criarDaCaptura(); };
 }
- 
+
 function tarefasDaAba(ignorarTri){
   let l = S.aba==="feitas" ? S.tarefas.filter(t=>t.feito) : pendentes();
   if(S.aba==="hoje")   l = l.filter(t=>t.prazo && diasAte(t.prazo)<=0);
@@ -782,13 +782,13 @@ function tarefasDaAba(ignorarTri){
     return (y.criadoEm||0) - (x.criadoEm||0);
   });
 }
- 
+
 function renderLista(){
   const r = document.getElementById("rolagem");
   if(S.aba!=="notas" || !S.notaAberta) r.dataset.nota = "";
   if(S.aba==="notas")    return S.notaAberta ? renderEditorNota(r) : renderNotas(r);
   if(S.aba==="arquivos") return renderArquivos(r);
- 
+
   const l = tarefasDaAba();
   if(!l.length){
     r.innerHTML = `<div class="vazio"><div class="eyebrow">Nada aqui</div>
@@ -831,7 +831,7 @@ function renderLista(){
   });
   r.querySelectorAll("[data-ok]").forEach(b=>b.onclick=()=>alternarFeito(b.dataset.ok));
 }
- 
+
 /* ========================= CAPTURA RÁPIDA ========================= */
 const DIAS_SEM = {dom:0,seg:1,ter:2,qua:3,qui:4,sex:5,sab:6,"sáb":6};
 function interpretar(txt){
@@ -883,7 +883,7 @@ async function criarDaCaptura(){
   S.tarefas.push(t); await DB.salvar("tarefas",t);
   render();
 }
- 
+
 /* ========================= AÇÕES DE TAREFA ========================= */
 async function alternarFeito(id){
   const t = S.tarefas.find(x=>x.id===id); if(!t) return;
@@ -901,7 +901,7 @@ async function adiar(id,dias){
   t.prazo = base.toISOString().slice(0,10); t.adiamentos = (t.adiamentos||0)+1;
   await DB.salvar("tarefas",t); render(); abrirTarefa(id);
 }
- 
+
 /* ========================= PAINEL DE DETALHE ========================= */
 const painel = document.getElementById("detalhe");
 function fechar(){ S.sel=null; S.selTipo=null; document.getElementById("app").classList.remove("com-detalhe"); painel.innerHTML=""; render(); }
@@ -910,7 +910,7 @@ function abrirPainel(html){
   painel.innerHTML = html;
   painel.querySelector("[data-fechar]").onclick = fechar;
 }
- 
+
 // Atualiza só a faixa de triagem e o texto de prazo no topo do painel.
 function atualizarCabecalho(id){
   const t = S.tarefas.find(x=>x.id===id); if(!t) return;
@@ -920,7 +920,7 @@ function atualizarCabecalho(id){
   topo.querySelector(".tri .eyebrow").textContent = f.nome;
   topo.querySelectorAll(".eyebrow")[1].textContent = prazoTexto(t);
 }
- 
+
 function abrirTarefa(id){
   const t = S.tarefas.find(x=>x.id===id); if(!t) return;
   S.sel = id; S.selTipo = "tarefa";
@@ -952,7 +952,7 @@ function abrirTarefa(id){
        <label class="campo"><span class="eyebrow">Esforço</span>
          <select class="ctrl" id="d-esf">${["curto","medio","longo"].map(v=>`<option value="${v}" ${t.esforco===v?"selected":""}>${v}</option>`).join("")}</select></label>
      </div>
- 
+
      <div class="campo">
        <span class="eyebrow">Passos ${p.length?`· ${p.filter(x=>x.ok).length} de ${p.length}`:""}</span>
        <div id="d-passos">${p.map((s,i)=>`
@@ -964,7 +964,7 @@ function abrirTarefa(id){
          </div>`).join("")}</div>
        <input class="ctrl" id="d-novo-passo" placeholder="Adicionar passo e Enter">
      </div>
- 
+
      <div class="campo">
        <span class="eyebrow">Arquivos desta tarefa</span>
        <div id="d-anexos">${(t.anexos||[]).map(aid=>{
@@ -982,10 +982,10 @@ function abrirTarefa(id){
          </select>
        </div>
      </div>
- 
+
      <label class="campo"><span class="eyebrow">Observações</span>
        <textarea class="ctrl" id="d-obs" placeholder="Contexto, links, o que precisa lembrar">${esc(t.obs||"")}</textarea></label>
- 
+
      <div class="acoes">
        <button class="btn btn-forte" id="d-ok">${t.feito?"Reabrir":"Concluir"}</button>
        <button class="btn" data-adiar="1">+1 dia</button>
@@ -994,7 +994,7 @@ function abrirTarefa(id){
      </div>
      ${t.adiamentos>1?`<div class="eyebrow" style="color:var(--t1)">Adiada ${t.adiamentos} vezes — talvez precise ser quebrada em passos menores.</div>`:""}
    </div>`);
- 
+
   const g = s => painel.querySelector(s);
   g("#d-tit").onblur   = e => atualizar(id,{titulo:e.target.value.trim()||"Sem título"});
   // O prazo só é gravado quando o campo perde o foco. Gravar a cada "change"
@@ -1007,6 +1007,11 @@ function abrirTarefa(id){
     atualizar(id,{prazo:v}); atualizarCabecalho(id);
   };
   prazoEl.onblur = comitarPrazo;
+  // No celular, o seletor nativo de data às vezes confirma sem tirar o foco
+  // do campo — sem isto, a data escolhida nunca era salva. Só aceita no
+  // "change" quando a data é válida (dentro de min/max), o que já barra
+  // o ano incompleto que causava o bug antigo no notebook.
+  prazoEl.onchange = () => { if(prazoEl.validity.valid) comitarPrazo(); };
   prazoEl.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); prazoEl.blur(); } };
   painel.querySelectorAll("[data-praz]").forEach(b=>b.onclick=()=>{
     const v = b.dataset.praz;
@@ -1054,21 +1059,21 @@ function abrirTarefa(id){
     await DB.salvar("tarefas",t); render(); abrirTarefa(id);
   });
 }
- 
+
 /* ========================= NOTAS =========================
    Editor em página cheia. O conteúdo é HTML editável (contenteditable);
    imagens ficam no banco de blobs e só o atributo data-blob é gravado.
    ========================================================= */
 const semTags = h => (h||"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
 const limpaNome = s => ((s||"nota").replace(/[\\/:*?"<>|]/g,"-").slice(0,60).trim() || "nota");
- 
+
 function baixarBlob(blob,nome){
   const u = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = u; a.download = nome; a.click();
   setTimeout(()=>URL.revokeObjectURL(u),5000);
 }
- 
+
 // Notas da versão anterior guardavam markdown em .corpo — convertidas na primeira abertura.
 function migrarNota(n){
   if(n.html !== undefined) return n;
@@ -1086,7 +1091,7 @@ function migrarNota(n){
   n.html = h; delete n.corpo;
   return n;
 }
- 
+
 function limparHtml(el){
   const c = el.cloneNode(true);
   c.querySelectorAll("img").forEach(i=>{ if(i.dataset.blob) i.removeAttribute("src"); });
@@ -1114,7 +1119,7 @@ async function restaurarImagens(el){
 }
 const esperarImagens = el => Promise.all([...el.querySelectorAll("img")]
   .map(i => i.complete ? Promise.resolve() : new Promise(ok=>{ i.onload = i.onerror = ok; })));
- 
+
 /* ---------- lista ---------- */
 function renderNotas(r){
   r.dataset.nota = "";
@@ -1138,7 +1143,7 @@ function renderNotas(r){
   });
   r.querySelectorAll("[data-ndel]").forEach(b=>b.onclick=()=>excluirNota(b.dataset.ndel));
 }
- 
+
 async function excluirNota(id){
   const n = S.notas.find(x=>x.id===id); if(!n) return;
   if(!await confirmarExclusao(`Excluir “${n.titulo}”?`,"As imagens dela continuam na aba Arquivos.")) return;
@@ -1147,7 +1152,7 @@ async function excluirNota(id){
   if(S.notaAberta === id) return fecharNota();
   render();
 }
- 
+
 function abrirNota(id){
   S.notaAberta = id; S.sel = null; S.selTipo = null;
   document.getElementById("app").classList.remove("com-detalhe");
@@ -1155,7 +1160,7 @@ function abrirNota(id){
   render();
 }
 function fecharNota(){ S.notaAberta = null; render(); }
- 
+
 /* ---------- editor ---------- */
 function renderEditorNota(r){
   const n = S.notas.find(x=>x.id===S.notaAberta);
@@ -1163,7 +1168,7 @@ function renderEditorNota(r){
   if(r.dataset.nota === n.id) return;   // já montado — não remontar enquanto digita
   migrarNota(n);
   r.dataset.nota = n.id;
- 
+
   r.innerHTML = `<div class="ed">
     <div class="ed-barra">
       <button class="tb" id="n-voltar" title="Voltar para a lista">←</button>
@@ -1204,14 +1209,14 @@ function renderEditorNota(r){
       <button class="btn btn-risco" id="n-del" style="margin-left:auto">Excluir nota</button>
     </div>
   </div>`;
- 
+
   const q = s => r.querySelector(s);
   const tit = q("#n-tit"), corpo = q("#n-corpo"), estado = q("#n-estado"), menu = q("#n-menu");
   corpo.innerHTML = n.html || "";
   restaurarImagens(corpo);
   const altura = () => { tit.style.height = "auto"; tit.style.height = tit.scrollHeight+"px"; };
   altura();
- 
+
   let tmr = null;
   const guardar = async () => {
     clearTimeout(tmr);
@@ -1223,16 +1228,16 @@ function renderEditorNota(r){
     setTimeout(()=>{ if(estado.textContent==="salvo") estado.textContent=""; },1500);
   };
   const agendar = () => { estado.textContent = "…"; clearTimeout(tmr); tmr = setTimeout(guardar,700); };
- 
+
   tit.oninput = () => { altura(); agendar(); };
   tit.onkeydown = e => { if(e.key==="Enter"){ e.preventDefault(); corpo.focus(); } };
   corpo.oninput = agendar;
   corpo.onblur = guardar;
- 
+
   q("#n-voltar").onclick = async () => { await guardar(); fecharNota(); };
   q("#n-del").onclick = () => excluirNota(n.id);
   q("#n-lixo").onclick = () => excluirNota(n.id);
- 
+
   // Clicar no seletor tira o foco do texto e apaga a seleção — por isso ela é
   // guardada antes e devolvida na hora de aplicar.
   let selSalva = null;
@@ -1241,7 +1246,7 @@ function renderEditorNota(r){
     if(sel.rangeCount && corpo.contains(sel.anchorNode)) selSalva = sel.getRangeAt(0).cloneRange();
   };
   ["keyup","mouseup","focus"].forEach(ev=>corpo.addEventListener(ev,guardarSel));
- 
+
   function aplicarTamanho(px){
     corpo.focus();
     const sel = getSelection();
@@ -1271,7 +1276,7 @@ function renderEditorNota(r){
   const selTam = q("#n-tam");
   selTam.onmousedown = guardarSel;
   selTam.onchange = () => { if(selTam.value){ aplicarTamanho(+selTam.value); selTam.value = ""; } };
- 
+
   // barra de formatação — onmousedown para não perder a seleção do texto
   r.querySelectorAll("[data-cmd]").forEach(b=>b.onmousedown=e=>{
     e.preventDefault(); corpo.focus();
@@ -1284,7 +1289,7 @@ function renderEditorNota(r){
     else document.execCommand(c);
     agendar();
   });
- 
+
   // atalhos de markdown no espaço
   const ATALHOS = {"#":["formatBlock","h2"],"##":["formatBlock","h3"],"###":["formatBlock","h3"],
                    "-":["insertUnorderedList"],"*":["insertUnorderedList"],"1.":["insertOrderedList"],
@@ -1301,7 +1306,7 @@ function renderEditorNota(r){
     document.execCommand(a[0], false, a[1]);
     agendar();
   });
- 
+
   async function inserirImagem(arquivo){
     const id2 = uid();
     await DB.salvar("blobs",{id:id2,blob:arquivo});
@@ -1327,7 +1332,7 @@ function renderEditorNota(r){
     document.execCommand("insertText", false, e.clipboardData.getData("text/plain"));
     agendar();
   });
- 
+
   q("#n-baixar").onclick = e => { e.stopPropagation(); menu.hidden = !menu.hidden; };
   r.onclick = e => { if(!e.target.closest(".menu")) menu.hidden = true; };
   r.querySelectorAll("[data-baixar]").forEach(b=>b.onclick=async()=>{
@@ -1337,7 +1342,7 @@ function renderEditorNota(r){
     else baixarDocx(n,corpo);
   });
 }
- 
+
 /* ---------- PDF: usa a janela de impressão do navegador ---------- */
 async function imprimirNota(n,corpo){
   const alvo = document.getElementById("imprimivel");
@@ -1346,7 +1351,7 @@ async function imprimirNota(n,corpo){
   window.print();
   setTimeout(()=>{ alvo.innerHTML = ""; },1500);
 }
- 
+
 /* ---------- Word: .docx gerado na mão, sem biblioteca ---------- */
 const TABELA_CRC = (()=>{
   const t = new Uint32Array(256);
@@ -1388,7 +1393,7 @@ function zipar(arquivos){
     {type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
 }
 const xmlEsc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
- 
+
 function wPar(conteudo,o){
   o = o || {};
   const ppr = `<w:pPr><w:spacing w:before="${o.antes||0}" w:after="${o.depois||120}" w:line="288" w:lineRule="auto"/>`
@@ -1507,7 +1512,7 @@ async function baixarDocx(n,corpo){
     ...midia.map(m=>({nome:"word/media/"+m.nome, dados:m.dados}))
   ]), limpaNome(n.titulo)+".docx");
 }
- 
+
 /* ========================= ARQUIVOS ========================= */
 const entradaArq = document.getElementById("arq-input");
 let aoEscolher = null;
@@ -1540,7 +1545,7 @@ async function abrirArquivo(id){
   window.open(url,"_blank");
   setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
- 
+
 function renderArquivos(r){
   const b = S.busca.toLowerCase();
   let l = S.arquivos.filter(a=>!b || (a.nome+" "+(a.tags||[]).join(" ")).toLowerCase().includes(b));
@@ -1561,7 +1566,7 @@ function renderArquivos(r){
     </div>`).join("")
     : `<div class="vazio"><div class="eyebrow">Pasta vazia</div>
        <p>Só entra aqui o que você colocar. Nada é varrido do seu aparelho automaticamente.</p></div>`);
- 
+
   r.querySelector("#b-env").onclick = () => escolherArquivos(null);
   r.querySelectorAll("[data-a]").forEach(el=>el.onclick=e=>{
     if(e.target.closest("button")) return; abrirArquivo(el.dataset.a);
@@ -1590,7 +1595,7 @@ function renderArquivos(r){
   });
 }
 const usadoEm = id => S.tarefas.filter(t=>(t.anexos||[]).includes(id)).length;
- 
+
 /* ========================= EXPORTAR / IMPORTAR ========================= */
 const b64 = blob => new Promise(ok=>{ const r=new FileReader(); r.onload=()=>ok(r.result.split(",")[1]); r.readAsDataURL(blob); });
 async function exportar(){
@@ -1622,7 +1627,7 @@ document.getElementById("imp-input").onchange = async e => {
   await salvarMeta(); render();
   avisar("Backup importado","Os itens do arquivo já estão na sua lista.");
 };
- 
+
 async function renderUso(){
   const tx = document.getElementById("uso-tx"), b = document.getElementById("uso-b");
   const total = S.arquivos.reduce((s,a)=>s+(a.tamanho||0),0);
@@ -1637,7 +1642,7 @@ async function renderUso(){
     if(e.quota) b.style.width = Math.min(100,(e.usage/e.quota)*100)+"%";
   }catch{}
 }
- 
+
 /* ========================= LIGAÇÕES GERAIS ========================= */
 document.getElementById("busca").oninput = e => { S.busca = e.target.value; renderLista(); };
 document.getElementById("b-tema").onclick = () => {
@@ -1670,7 +1675,7 @@ document.getElementById("sec-add").onclick = async () => {
 };
 document.getElementById("b-menu").onclick = abrirMenu;
 document.getElementById("fundo-menu").onclick = fecharMenu;
- 
+
 document.addEventListener("keydown", e => {
   if(e.key === "Escape" && S.sel) return fechar();
   // O corpo da nota é uma div editável, não um input — precisa entrar no teste,
@@ -1682,7 +1687,7 @@ document.addEventListener("keydown", e => {
   if(e.key === "/"){ e.preventDefault(); document.getElementById("busca").focus(); }
   if(e.key === "n"){ e.preventDefault(); document.getElementById("cap")?.focus(); }
 });
- 
+
 /* ========================= INÍCIO ========================= */
 (async () => {
   try{ const t = localStorage.getItem("estacao-tema"); if(t) document.documentElement.dataset.tema = t; }catch{}
@@ -1708,4 +1713,3 @@ document.addEventListener("keydown", e => {
 </script>
 </body>
 </html>
- 
