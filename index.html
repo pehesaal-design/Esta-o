@@ -565,32 +565,80 @@ function renderConta(){
 }
 
 /* =========================================================================
-   TRIAGEM — classificação de risco aplicada a prazo.
-   Prioridade e esforço deslocam a tarefa uma faixa para cima ou para baixo.
+   TRIAGEM — urgência por FOLGA AJUSTADA, não por faixa fixa.
+
+   A ideia: o que importa não é o prazo, é a folga real — quanto tempo sobra
+   depois de descontar o trabalho que a tarefa ainda exige.
+
+     folga = dias_restantes − espaço_que_falta
+     espaço_que_falta = espaço_do_esforço × (1 − fração_de_passos_concluídos)
+     folga_ajustada = folga × peso_da_prioridade
+
+   Prioridade não desconta dias — ela ENCOLHE a régua (multiplica), então seu
+   efeito é proporcional: pesa muito quando o prazo aperta, pouco quando há
+   folga de sobra. A cor é só a leitura da folga ajustada.
+
+   Os números abaixo são calibrados nos casos do Pedro (ex.: longo + alta +
+   7 dias + 0% feito = Laranja). São o lugar para afinar no uso — mexa aqui,
+   não na lógica.
    ========================================================================= */
-const FAIXAS = [
-  {id:0,nome:"Vermelho",desc:"vencida ou vence hoje",cor:"var(--t0)"},
-  {id:1,nome:"Laranja", desc:"muito urgente",        cor:"var(--t1)"},
-  {id:2,nome:"Amarelo", desc:"urgente",              cor:"var(--t2)"},
-  {id:3,nome:"Verde",   desc:"pouco urgente",        cor:"var(--t3)"},
-  {id:4,nome:"Azul",    desc:"sem prazo definido",   cor:"var(--t4)"}
+const ESFORCOS = [
+  {id:"muito_curto", nome:"muito curto", dias:0.1},
+  {id:"curto",       nome:"curto",       dias:0.5},
+  {id:"medio",       nome:"médio",       dias:2},
+  {id:"longo",       nome:"longo",       dias:6},
+  {id:"muito_longo", nome:"muito longo", dias:12}
 ];
+const PRIORIDADES = [
+  {id:"muito_alta", nome:"muito alta", peso:0.4},
+  {id:"alta",       nome:"alta",       peso:0.6},
+  {id:"media",      nome:"média",      peso:1},
+  {id:"baixa",      nome:"baixa",      peso:1.5},
+  {id:"muito_baixa",nome:"muito baixa",peso:2.2}
+];
+const espacoDe = id => (ESFORCOS.find(e=>e.id===id) || ESFORCOS[2]).dias;
+const pesoDe   = id => (PRIORIDADES.find(p=>p.id===id) || PRIORIDADES[2]).peso;
+
+// Cortes de cor sobre a folga ajustada. Vermelho e Cinza são decididos antes,
+// por regra dura (data vencida / ausência de data), nunca pelo número.
+const FAIXAS = [
+  {id:0,nome:"Vermelho",desc:"vencida ou vence hoje", cor:"var(--t0)"},
+  {id:1,nome:"Laranja", desc:"muito urgente",         cor:"var(--t1)"},
+  {id:2,nome:"Amarelo", desc:"urgente",               cor:"var(--t2)"},
+  {id:3,nome:"Verde",   desc:"pouco urgente",         cor:"var(--t3)"},
+  {id:4,nome:"Azul",    desc:"com prazo, tranquilo",  cor:"var(--t4)"},
+  {id:5,nome:"Cinza",   desc:"sem prazo definido",    cor:"var(--t5)"}
+];
+const CONCLUIDA = {id:9,nome:"Concluída",desc:"",cor:"var(--t5)"};
+
 const hojeISO = () => new Date().toISOString().slice(0,10);
 function diasAte(iso){
   if(!iso) return null;
   const a = new Date(iso+"T00:00:00"), b = new Date(hojeISO()+"T00:00:00");
   return Math.round((a-b)/86400000);
 }
-function triagem(t){
-  if(t.feito) return {id:5,nome:"Concluída",desc:"",cor:"var(--t5)"};
+function fracaoFeita(t){
+  const p = t.passos || [];
+  if(!p.length) return 0;                 // sem passos = pior caso (nada feito)
+  return p.filter(x=>x.ok).length / p.length;
+}
+// Número contínuo de urgência. Menor = mais urgente. Usado para cor E ranking.
+function folgaAjustada(t){
   const d = diasAte(t.prazo);
-  if(d === null) return FAIXAS[4];
-  let base = d < 0 ? 0 : d === 0 ? 1 : d <= 2 ? 2 : d <= 7 ? 3 : 4;
-  if(t.prioridade === "alta") base -= 1;
-  if(t.prioridade === "baixa") base += 1;
-  if(t.esforco === "longo" && d <= 7) base -= 1;
-  if(t.esforco === "curto" && d > 2) base += 1;
-  return FAIXAS[Math.max(0,Math.min(4,base))];
+  if(d === null) return Infinity;
+  const espaco = espacoDe(t.esforco) * (1 - fracaoFeita(t));
+  return (d - espaco) * pesoDe(t.prioridade);
+}
+function triagem(t){
+  if(t.feito) return CONCLUIDA;
+  const d = diasAte(t.prazo);
+  if(d === null) return FAIXAS[5];        // Cinza: sem data
+  if(d <= 0)     return FAIXAS[0];        // Vermelho: vencida ou hoje, sempre
+  const f = folgaAjustada(t);
+  if(f < 1)  return FAIXAS[1];            // Laranja
+  if(f < 3)  return FAIXAS[2];            // Amarelo
+  if(f < 7)  return FAIXAS[3];            // Verde
+  return FAIXAS[4];                       // Azul
 }
 function prazoTexto(t){
   const d = diasAte(t.prazo);
@@ -756,7 +804,7 @@ function renderCaptura(){
   } else {
     w.innerHTML = `<div class="captura">
       <input id="cap" placeholder="Nova tarefa — ex.: revisar semiologia 12/09 !alta #Monitoria">
-      <span class="dica">!alta &nbsp; #categoria &nbsp; 12/09 &nbsp; ~longo</span>
+      <span class="dica">!alta · !muito-alta &nbsp; #categoria &nbsp; 12/09 &nbsp; ~longo · ~muito-curto</span>
       <button class="ent" id="cap-b">Enter</button></div>`;
     document.getElementById("cap-b").onclick = criarDaCaptura;
   }
@@ -776,6 +824,10 @@ function tarefasDaAba(ignorarTri){
   }
   return l.sort((x,y)=>{
     const d = triagem(x).id - triagem(y).id; if(d) return d;
+    // Dentro da mesma faixa, a folga ajustada desempata — duas amarelas não
+    // ficam empatadas, a mais apertada sobe.
+    const fx = folgaAjustada(x), fy = folgaAjustada(y);
+    if(fx !== fy) return fx - fy;
     if(x.prazo && y.prazo && x.prazo!==y.prazo) return x.prazo < y.prazo ? -1 : 1;
     if(x.prazo && !y.prazo) return -1;
     if(!x.prazo && y.prazo) return 1;
@@ -838,10 +890,20 @@ function interpretar(txt){
   const t = {id:uid(),titulo:"",categoria:S.cat||null,prazo:null,prioridade:"media",esforco:"medio",
              passos:[],anexos:[],obs:"",feito:false,criadoEm:Date.now(),adiamentos:0};
   let s = " "+txt+" ";
-  s = s.replace(/\s![aA]lta\b/,()=>{t.prioridade="alta";return " ";})
+  // Prioridade: !muito-alta / !alta / !media / !baixa / !muito-baixa
+  // (aceita "muito alta", "muito-alta" ou "muitoalta"; ordem importa — os
+  //  "muito" antes dos simples pra não casar só o "alta" de "muito alta").
+  s = s.replace(/\s!muito[\s-]?alta\b/i,()=>{t.prioridade="muito_alta";return " ";})
+       .replace(/\s!muito[\s-]?baixa\b/i,()=>{t.prioridade="muito_baixa";return " ";})
+       .replace(/\s![aA]lta\b/,()=>{t.prioridade="alta";return " ";})
        .replace(/\s![bB]aixa\b/,()=>{t.prioridade="baixa";return " ";})
-       .replace(/\s![mM]edia\b|\s![mM]édia\b/,()=>{t.prioridade="media";return " ";})
-       .replace(/\s~(curto|medio|médio|longo)\b/i,(_,v)=>{t.esforco=v.toLowerCase().startsWith("c")?"curto":v.toLowerCase().startsWith("l")?"longo":"medio";return " ";})
+       .replace(/\s![mM][eé]dia\b/,()=>{t.prioridade="media";return " ";})
+       // Esforço: ~muito-curto / ~curto / ~medio / ~longo / ~muito-longo
+       .replace(/\s~muito[\s-]?curto\b/i,()=>{t.esforco="muito_curto";return " ";})
+       .replace(/\s~muito[\s-]?longo\b/i,()=>{t.esforco="muito_longo";return " ";})
+       .replace(/\s~curto\b/i,()=>{t.esforco="curto";return " ";})
+       .replace(/\s~longo\b/i,()=>{t.esforco="longo";return " ";})
+       .replace(/\s~m[eé]dio\b/i,()=>{t.esforco="medio";return " ";})
        .replace(/\s#(\S+)/,(_,v)=>{
           const achou = S.meta.categorias.find(c=>c.toLowerCase()===v.toLowerCase());
           if(achou) t.categoria = achou;
@@ -948,9 +1010,9 @@ function abrirTarefa(id){
          ${S.meta.categorias.map(c=>`<option ${t.categoria===c?"selected":""}>${esc(c)}</option>`).join("")}
          </select></label>
        <label class="campo"><span class="eyebrow">Prioridade</span>
-         <select class="ctrl" id="d-pri">${["alta","media","baixa"].map(v=>`<option value="${v}" ${t.prioridade===v?"selected":""}>${v}</option>`).join("")}</select></label>
+         <select class="ctrl" id="d-pri">${PRIORIDADES.map(p=>`<option value="${p.id}" ${t.prioridade===p.id?"selected":""}>${p.nome}</option>`).join("")}</select></label>
        <label class="campo"><span class="eyebrow">Esforço</span>
-         <select class="ctrl" id="d-esf">${["curto","medio","longo"].map(v=>`<option value="${v}" ${t.esforco===v?"selected":""}>${v}</option>`).join("")}</select></label>
+         <select class="ctrl" id="d-esf">${ESFORCOS.map(e=>`<option value="${e.id}" ${t.esforco===e.id?"selected":""}>${e.nome}</option>`).join("")}</select></label>
      </div>
 
      <div class="campo">
