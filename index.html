@@ -179,6 +179,45 @@ textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size
 .ed-corpo blockquote{border-left:2px solid var(--acc);padding-left:14px;margin:12px 0;color:var(--mut)}
 .ed-corpo img{max-width:100%;height:auto;border-radius:var(--r);border:1px solid var(--line);margin:14px 0;display:block}
 .ed-corpo hr{border:none;border-top:1px solid var(--line);margin:22px 0}
+/* grifo (marca-texto) e cor de texto */
+.ed-corpo mark{border-radius:2px;padding:0 2px}
+mark.g-amarelo{background:#f4e07f;color:#1a1a1a}
+mark.g-verde{background:#a6e0a6;color:#1a1a1a}
+mark.g-rosa{background:#f4b0c8;color:#1a1a1a}
+mark.g-azul{background:#a9d3f0;color:#1a1a1a}
+.ed-corpo .c-vermelho{color:#e06b63}
+.ed-corpo .c-verde{color:#4fa86a}
+.ed-corpo .c-azul{color:#5a9fd6}
+.ed-corpo .c-laranja{color:#e0913a}
+/* blocos de destaque (callouts) */
+.ed-corpo .callout{display:flex;gap:10px;padding:11px 14px;border-radius:var(--r);margin:14px 0;
+  border:1px solid var(--line);border-left-width:3px;background:var(--surf)}
+.ed-corpo .callout .cl-ic{flex:none;font-size:16px;line-height:1.5;user-select:none}
+.ed-corpo .callout .cl-tx{flex:1;min-width:0}
+.ed-corpo .callout .cl-tx>*:first-child{margin-top:0}
+.ed-corpo .callout .cl-tx>*:last-child{margin-bottom:0}
+.callout.cl-aviso {border-left-color:var(--t1);background:rgba(224,128,58,.09)}
+.callout.cl-importante{border-left-color:var(--t0);background:rgba(214,66,60,.09)}
+.callout.cl-dica  {border-left-color:var(--t3);background:rgba(79,168,106,.09)}
+.callout.cl-nota  {border-left-color:var(--t4);background:rgba(90,159,214,.09)}
+/* toggle recolhível */
+.ed-corpo details.toggle{margin:12px 0;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--surf);overflow:hidden}
+.ed-corpo details.toggle>summary{cursor:pointer;padding:9px 13px;font-family:var(--f-ui);font-weight:600;
+  list-style:none;display:flex;align-items:center;gap:8px;user-select:none}
+.ed-corpo details.toggle>summary::-webkit-details-marker{display:none}
+.ed-corpo details.toggle>summary::before{content:"▸";color:var(--mut);transition:transform .15s;flex:none}
+.ed-corpo details.toggle[open]>summary::before{transform:rotate(90deg)}
+.ed-corpo details.toggle>.tg-corpo{padding:2px 13px 11px 30px}
+.ed-corpo details.toggle>.tg-corpo>*:first-child{margin-top:4px}
+/* menu suspenso de cores/blocos na barra */
+.pop{position:relative}
+.pop-lista{position:absolute;left:0;top:calc(100% + 6px);background:var(--surf);border:1px solid var(--line);
+  border-radius:var(--r);padding:5px;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.4);min-width:150px}
+.pop-lista button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:6px 9px;
+  border-radius:4px;font-size:13px;color:var(--tx);white-space:nowrap}
+.pop-lista button:hover{background:var(--surf2)}
+.pop-lista .amostra{width:14px;height:14px;border-radius:3px;flex:none}
 .ed-pe{border-top:1px solid var(--line);margin-top:24px;padding:12px 0 60px;display:flex;gap:8px;align-items:center}
 .rapidos{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
 
@@ -195,6 +234,23 @@ textarea.ctrl{resize:vertical;min-height:80px;font-family:var(--f-ler);font-size
   #imprimivel h3{font-family:"Space Grotesk",sans-serif;font-size:12.5pt;margin:12pt 0 3pt}
   #imprimivel img{max-width:100%;page-break-inside:avoid}
   #imprimivel blockquote{border-left:2pt solid #999;padding-left:10pt;color:#444}
+  #imprimivel mark.g-amarelo{background:#f4e07f}
+  #imprimivel mark.g-verde{background:#a6e0a6}
+  #imprimivel mark.g-rosa{background:#f4b0c8}
+  #imprimivel mark.g-azul{background:#a9d3f0}
+  #imprimivel .c-vermelho{color:#c0392b}
+  #imprimivel .c-verde{color:#1e8449}
+  #imprimivel .c-azul{color:#2471a3}
+  #imprimivel .c-laranja{color:#ca6f1e}
+  #imprimivel .callout{border:1pt solid #ccc;border-left:3pt solid #888;padding:8pt 10pt;margin:8pt 0;
+    background:#f6f6f6;page-break-inside:avoid;display:flex;gap:8pt}
+  #imprimivel .callout.cl-aviso{border-left-color:#e0913a}
+  #imprimivel .callout.cl-importante{border-left-color:#d6423c}
+  #imprimivel .callout.cl-dica{border-left-color:#4fa86a}
+  #imprimivel .callout.cl-nota{border-left-color:#5a9fd6}
+  #imprimivel details.toggle{border:1pt solid #ccc;padding:6pt 10pt;margin:8pt 0;page-break-inside:avoid}
+  #imprimivel details.toggle>summary{font-weight:bold;list-style:none}
+  #imprimivel details.toggle .tg-corpo{padding-left:14pt;margin-top:4pt}
 }
 
 /* ---------- diálogos próprios ---------- */
@@ -1157,6 +1213,10 @@ function migrarNota(n){
 function limparHtml(el){
   const c = el.cloneNode(true);
   c.querySelectorAll("img").forEach(i=>{ if(i.dataset.blob) i.removeAttribute("src"); });
+  // Toggles são salvos fechados, pra funcionarem como flashcard ao reabrir a nota.
+  c.querySelectorAll("details.toggle").forEach(d=>d.removeAttribute("open"));
+  // contenteditable é estado de edição, não conteúdo — não precisa ser salvo.
+  c.querySelectorAll("[contenteditable]").forEach(i=>i.removeAttribute("contenteditable"));
   // Mantém só o que é formatação de texto; o resto (cores e espaçamentos que
   // vêm colados de fora) continua sendo descartado.
   const MANTER = ["font-size","font-family","font-weight","font-style","text-decoration"];
@@ -1235,6 +1295,9 @@ function renderEditorNota(r){
     <div class="ed-barra">
       <button class="tb" id="n-voltar" title="Voltar para a lista">←</button>
       <span class="sep"></span>
+      <button class="tb" id="n-desfazer" title="Desfazer (Ctrl+Z)">↶</button>
+      <button class="tb" id="n-refazer" title="Refazer (Ctrl+Y)">↷</button>
+      <span class="sep"></span>
       <button class="tb" data-cmd="h2" title="Título">H1</button>
       <button class="tb" data-cmd="h3" title="Subtítulo">H2</button>
       <button class="tb" data-cmd="bold" title="Negrito (Ctrl+B)"><b>B</b></button>
@@ -1242,9 +1305,40 @@ function renderEditorNota(r){
       <span class="sep"></span>
       <button class="tb" data-cmd="ul" title="Lista">•</button>
       <button class="tb" data-cmd="ol" title="Lista numerada">1.</button>
-      <button class="tb serif" data-cmd="quote" title="Citação">”</button>
+      <button class="tb" data-cmd="quote" title="Citação">”</button>
       <button class="tb" data-cmd="hr" title="Linha separadora">—</button>
       <button class="tb" id="n-img" title="Inserir imagem">▣</button>
+      <span class="sep"></span>
+      <div class="pop">
+        <button class="tb" id="n-grifo-b" title="Marca-texto"><span style="background:#f4e07f;color:#1a1a1a;border-radius:2px;padding:0 3px">G</span></button>
+        <div class="pop-lista" id="n-grifo-l" hidden>
+          <button data-grifo="g-amarelo"><span class="amostra" style="background:#f4e07f"></span>Amarelo</button>
+          <button data-grifo="g-verde"><span class="amostra" style="background:#a6e0a6"></span>Verde</button>
+          <button data-grifo="g-rosa"><span class="amostra" style="background:#f4b0c8"></span>Rosa</button>
+          <button data-grifo="g-azul"><span class="amostra" style="background:#a9d3f0"></span>Azul</button>
+          <button data-grifo=""><span class="amostra" style="border:1px solid var(--line)"></span>Remover</button>
+        </div>
+      </div>
+      <div class="pop">
+        <button class="tb" id="n-cor-b" title="Cor do texto"><span style="color:#e06b63;font-weight:700">A</span></button>
+        <div class="pop-lista" id="n-cor-l" hidden>
+          <button data-cor="c-vermelho"><span class="amostra" style="background:#e06b63"></span>Vermelho</button>
+          <button data-cor="c-verde"><span class="amostra" style="background:#4fa86a"></span>Verde</button>
+          <button data-cor="c-azul"><span class="amostra" style="background:#5a9fd6"></span>Azul</button>
+          <button data-cor="c-laranja"><span class="amostra" style="background:#e0913a"></span>Laranja</button>
+          <button data-cor=""><span class="amostra" style="border:1px solid var(--line)"></span>Padrão</button>
+        </div>
+      </div>
+      <div class="pop">
+        <button class="tb" id="n-bloco-b" title="Inserir bloco">▦</button>
+        <div class="pop-lista" id="n-bloco-l" hidden>
+          <button data-bloco="aviso">⚠️ Aviso</button>
+          <button data-bloco="importante">📌 Importante</button>
+          <button data-bloco="dica">💡 Dica</button>
+          <button data-bloco="nota">📝 Nota</button>
+          <button data-bloco="toggle">▸ Recolhível (flashcard)</button>
+        </div>
+      </div>
       <span class="sep"></span>
       <select class="tb-sel" id="n-tam" title="Tamanho do texto selecionado">
         <option value="">Tamanho</option>
@@ -1276,6 +1370,12 @@ function renderEditorNota(r){
   const tit = q("#n-tit"), corpo = q("#n-corpo"), estado = q("#n-estado"), menu = q("#n-menu");
   corpo.innerHTML = n.html || "";
   restaurarImagens(corpo);
+  // Reabilita a edição dentro dos blocos de destaque (o contenteditable é
+  // removido ao salvar); o ícone continua não-editável.
+  corpo.querySelectorAll(".callout").forEach(c=>{
+    c.setAttribute("contenteditable","true");
+    const ic = c.querySelector(".cl-ic"); if(ic) ic.setAttribute("contenteditable","false");
+  });
   const altura = () => { tit.style.height = "auto"; tit.style.height = tit.scrollHeight+"px"; };
   altura();
 
@@ -1291,12 +1391,58 @@ function renderEditorNota(r){
   };
   const agendar = () => { estado.textContent = "…"; clearTimeout(tmr); tmr = setTimeout(guardar,700); };
 
+  /* ---- histórico próprio de desfazer/refazer ----
+     Necessário porque as inserções por botão (linha, callout, toggle, grifo…)
+     mexem no conteúdo via código e NÃO entram na pilha de desfazer nativa do
+     navegador. Guardamos fotos do HTML e restauramos sob demanda. */
+  const historia = [corpo.innerHTML];
+  let hp = 0;              // ponteiro para o estado atual
+  let tmrHist = null;
+  function fotografar(){
+    const atual = corpo.innerHTML;
+    if(atual === historia[hp]) return;
+    historia.splice(hp+1);           // descarta o "futuro" ao editar de novo
+    historia.push(atual);
+    if(historia.length > 120){ historia.shift(); } else { hp++; }
+    atualizarBotoesHist();
+  }
+  // digitação livre agrega várias teclas numa foto só, pra não poluir o histórico
+  function fotografarDebounce(){ clearTimeout(tmrHist); tmrHist = setTimeout(fotografar, 500); }
+  // antes de uma ação por botão, congela o estado atual imediatamente
+  function fotografarJa(){ clearTimeout(tmrHist); fotografar(); }
+  function restaurar(delta){
+    const alvo = hp + delta;
+    if(alvo < 0 || alvo >= historia.length) return;
+    hp = alvo;
+    corpo.innerHTML = historia[hp];
+    restaurarImagens(corpo);
+    corpo.querySelectorAll(".callout").forEach(c=>{
+      c.setAttribute("contenteditable","true");
+      const ic = c.querySelector(".cl-ic"); if(ic) ic.setAttribute("contenteditable","false");
+    });
+    atualizarBotoesHist();
+    guardar();
+  }
+  function atualizarBotoesHist(){
+    const bu = q("#n-desfazer"), br = q("#n-refazer");
+    if(bu) bu.style.opacity = hp > 0 ? "1" : ".35";
+    if(br) br.style.opacity = hp < historia.length-1 ? "1" : ".35";
+  }
+
   tit.oninput = () => { altura(); agendar(); };
   tit.onkeydown = e => { if(e.key==="Enter"){ e.preventDefault(); corpo.focus(); } };
-  corpo.oninput = agendar;
+  corpo.oninput = () => { agendar(); fotografarDebounce(); };
   corpo.onblur = guardar;
+  // Ctrl+Z / Ctrl+Y (ou Ctrl+Shift+Z) usam o nosso histórico, não o do navegador
+  corpo.addEventListener("keydown", e => {
+    if((e.ctrlKey||e.metaKey) && !e.shiftKey && e.key.toLowerCase()==="z"){ e.preventDefault(); restaurar(-1); }
+    else if((e.ctrlKey||e.metaKey) && (e.key.toLowerCase()==="y" || (e.shiftKey && e.key.toLowerCase()==="z"))){ e.preventDefault(); restaurar(+1); }
+  });
 
   q("#n-voltar").onclick = async () => { await guardar(); fecharNota(); };
+  q("#n-desfazer").onmousedown = e => { e.preventDefault(); restaurar(-1); };
+  q("#n-refazer").onmousedown = e => { e.preventDefault(); restaurar(+1); };
+  atualizarBotoesHist();
   q("#n-del").onclick = () => excluirNota(n.id);
   q("#n-lixo").onclick = () => excluirNota(n.id);
 
@@ -1337,11 +1483,104 @@ function renderEditorNota(r){
   }
   const selTam = q("#n-tam");
   selTam.onmousedown = guardarSel;
-  selTam.onchange = () => { if(selTam.value){ aplicarTamanho(+selTam.value); selTam.value = ""; } };
+  selTam.onchange = () => { if(selTam.value){ fotografarJa(); aplicarTamanho(+selTam.value); fotografar(); selTam.value = ""; } };
+
+  // ---- menus suspensos (grifo, cor, blocos) ----
+  function ligarPop(botaoId, listaId, aoEscolher){
+    const b = q(botaoId), l = q(listaId);
+    b.onmousedown = e => { e.preventDefault(); guardarSel(); };
+    b.onclick = e => {
+      e.stopPropagation();
+      [q("#n-grifo-l"),q("#n-cor-l"),q("#n-bloco-l")].forEach(x=>{ if(x!==l) x.hidden=true; });
+      l.hidden = !l.hidden;
+    };
+    l.querySelectorAll("button").forEach(op=>op.onmousedown=e=>{
+      e.preventDefault(); l.hidden = true; fotografarJa(); aoEscolher(op.dataset); fotografar(); agendar();
+    });
+  }
+  // restaura a seleção guardada antes de aplicar qualquer coisa
+  const comSelecao = fn => {
+    corpo.focus();
+    const sel = getSelection();
+    if(selSalva){ sel.removeAllRanges(); sel.addRange(selSalva); }
+    if(!sel.rangeCount) return;
+    fn(sel);
+    selSalva = null;
+  };
+
+  // Envolve o texto selecionado numa tag com classe. Se já houver uma tag do
+  // mesmo tipo, troca a classe (não empilha grifo sobre grifo).
+  function envolver(tag, classe, grupoClasses){
+    comSelecao(sel => {
+      const r0 = sel.getRangeAt(0);
+      if(r0.collapsed) return;
+      // remove marcações do mesmo grupo que já estejam dentro da seleção
+      const frag = r0.cloneContents();
+      const limpo = document.createElement("div");
+      limpo.appendChild(frag);
+      limpo.querySelectorAll(tag).forEach(el=>{
+        if(grupoClasses.some(c=>el.classList.contains(c))){
+          const pai = el.parentNode;
+          while(el.firstChild) pai.insertBefore(el.firstChild, el);
+          pai.removeChild(el);
+        }
+      });
+      r0.deleteContents();
+      if(classe){
+        const wrap = document.createElement(tag);
+        wrap.className = classe;
+        wrap.appendChild(limpo.firstChild ? document.createRange().createContextualFragment(limpo.innerHTML) : document.createTextNode(""));
+        r0.insertNode(wrap);
+      } else {
+        r0.insertNode(document.createRange().createContextualFragment(limpo.innerHTML));
+      }
+    });
+  }
+
+  const GRIFOS = ["g-amarelo","g-verde","g-rosa","g-azul"];
+  const CORES  = ["c-vermelho","c-verde","c-azul","c-laranja"];
+  ligarPop("#n-grifo-b","#n-grifo-l", d => envolver("mark", d.grifo, GRIFOS));
+  ligarPop("#n-cor-b","#n-cor-l",     d => envolver("span", d.cor, CORES));
+
+  const ICONE_BLOCO = {aviso:"⚠️",importante:"📌",dica:"💡",nota:"📝"};
+  ligarPop("#n-bloco-b","#n-bloco-l", d => {
+    comSelecao(sel => {
+      const r0 = sel.getRangeAt(0);
+      const dentro = sel.toString() || "";
+      let node;
+      if(d.bloco === "toggle"){
+        node = document.createElement("details");
+        node.className = "toggle"; node.open = true;
+        const s = document.createElement("summary");
+        s.textContent = "Clique para expandir";
+        const c = document.createElement("div");
+        c.className = "tg-corpo";
+        c.innerHTML = "<p>" + (esc(dentro) || "Conteúdo escondido…") + "</p>";
+        node.append(s,c);
+      } else {
+        node = document.createElement("div");
+        node.className = "callout cl-" + d.bloco;
+        node.setAttribute("contenteditable","true");
+        const ic = document.createElement("div");
+        ic.className = "cl-ic"; ic.setAttribute("contenteditable","false");
+        ic.textContent = ICONE_BLOCO[d.bloco] || "📝";
+        const tx = document.createElement("div");
+        tx.className = "cl-tx";
+        tx.innerHTML = "<p>" + (esc(dentro) || "Escreva aqui…") + "</p>";
+        node.append(ic,tx);
+      }
+      r0.deleteContents();
+      r0.insertNode(node);
+      // parágrafo vazio depois, pra dar como continuar escrevendo fora do bloco
+      const p = document.createElement("p"); p.innerHTML = "<br>";
+      node.after(p);
+    });
+  });
 
   // barra de formatação — onmousedown para não perder a seleção do texto
   r.querySelectorAll("[data-cmd]").forEach(b=>b.onmousedown=e=>{
     e.preventDefault(); corpo.focus();
+    fotografarJa();
     const c = b.dataset.cmd;
     if(c==="h2"||c==="h3") document.execCommand("formatBlock",false,c);
     else if(c==="ul") document.execCommand("insertUnorderedList");
@@ -1349,6 +1588,7 @@ function renderEditorNota(r){
     else if(c==="quote") document.execCommand("formatBlock",false,"blockquote");
     else if(c==="hr") document.execCommand("insertHorizontalRule");
     else document.execCommand(c);
+    fotografar();
     agendar();
   });
 
@@ -1377,8 +1617,10 @@ function renderEditorNota(r){
     S.arquivos.push(meta); await DB.salvar("arquivos",meta);
     if(!S.meta.pastas.includes("Imagens de notas")){ S.meta.pastas.push("Imagens de notas"); await salvarMeta(); }
     corpo.focus();
+    fotografarJa();
     document.execCommand("insertHTML", false,
       `<img data-blob="${id2}" src="${URL.createObjectURL(arquivo)}"><p><br></p>`);
+    fotografar();
     guardar();
   }
   q("#n-img").onclick = () => {
@@ -1396,7 +1638,10 @@ function renderEditorNota(r){
   });
 
   q("#n-baixar").onclick = e => { e.stopPropagation(); menu.hidden = !menu.hidden; };
-  r.onclick = e => { if(!e.target.closest(".menu")) menu.hidden = true; };
+  r.onclick = e => {
+    if(!e.target.closest(".menu")) menu.hidden = true;
+    if(!e.target.closest(".pop")) r.querySelectorAll(".pop-lista").forEach(x=>x.hidden=true);
+  };
   r.querySelectorAll("[data-baixar]").forEach(b=>b.onclick=async()=>{
     menu.hidden = true;
     await guardar();
@@ -1409,6 +1654,7 @@ function renderEditorNota(r){
 async function imprimirNota(n,corpo){
   const alvo = document.getElementById("imprimivel");
   alvo.innerHTML = `<h1>${esc(n.titulo)}</h1><div class="data">${new Date(n.atualizadoEm).toLocaleDateString("pt-BR")}</div>` + corpo.innerHTML;
+  alvo.querySelectorAll("details").forEach(d=>d.setAttribute("open","")); // no papel, tudo visível
   await esperarImagens(alvo);
   window.print();
   setTimeout(()=>{ alvo.innerHTML = ""; },1500);
@@ -1470,6 +1716,7 @@ function wCorridas(no,fmt){
       if(!c.textContent) return;
       const rpr = (fmt.b?"<w:b/>":"") + (fmt.i?"<w:i/>":"")
         + (fmt.sz?`<w:sz w:val="${fmt.sz}"/><w:szCs w:val="${fmt.sz}"/>`:"")
+        + (fmt.realce?`<w:highlight w:val="${fmt.realce}"/>`:"")
         + (fmt.cor?`<w:color w:val="${fmt.cor}"/>`:"");
       out += `<w:r>${rpr?`<w:rPr>${rpr}</w:rPr>`:""}<w:t xml:space="preserve">${xmlEsc(c.textContent)}</w:t></w:r>`;
     } else if(c.nodeType === 1){
@@ -1482,6 +1729,12 @@ function wCorridas(no,fmt){
       // px -> meio-pontos: 16px = 12pt = 24 meio-pontos
       const px = c.style && parseFloat(c.style.fontSize);
       if(px) f.sz = Math.round(px * 1.5);
+      // grifo (mark) -> realce nativo do Word; cor de texto -> w:color
+      const cls = c.className || "";
+      const REALCE = {"g-amarelo":"yellow","g-verde":"green","g-rosa":"magenta","g-azul":"cyan"};
+      const CORHEX = {"c-vermelho":"C0392B","c-verde":"1E8449","c-azul":"2471A3","c-laranja":"CA6F1E"};
+      for(const k in REALCE) if(cls.includes(k)) f.realce = REALCE[k];
+      for(const k in CORHEX) if(cls.includes(k)) f.cor = CORHEX[k];
       out += wCorridas(c,f);
     }
   });
@@ -1522,6 +1775,31 @@ async function wBlocos(raiz,midia){
     if(no.nodeType !== 1) continue;
     const tag = no.tagName.toLowerCase();
     if(tag === "img"){ xml += await wImagem(no,midia); continue; }
+    // blocos de destaque: fundo sombreado + barra colorida à esquerda + ícone
+    if(no.classList && no.classList.contains("callout")){
+      const CORB = {"cl-aviso":"E0913A","cl-importante":"D6423C","cl-dica":"4FA86A","cl-nota":"5A9FD6"};
+      let cor = "5A9FD6"; for(const k in CORB) if(no.classList.contains(k)) cor = CORB[k];
+      const ic = no.querySelector(".cl-ic"); const tx = no.querySelector(".cl-tx") || no;
+      const icTxt = ic ? ic.textContent + "  " : "";
+      const filhos = [...tx.children].filter(x=>x.textContent.trim() || x.querySelector && x.querySelector("img"));
+      const linhas = filhos.length ? filhos : [tx];
+      linhas.forEach((el,idx)=>{
+        const pref = idx===0 ? `<w:r><w:rPr><w:b/></w:rPr><w:t xml:space="preserve">${xmlEsc(icTxt)}</w:t></w:r>` : "";
+        const sombra = `<w:shd w:val="clear" w:fill="F2F2F2"/>`;
+        const borda = `<w:pBdr><w:left w:val="single" w:sz="18" w:space="8" w:color="${cor}"/></w:pBdr>`;
+        xml += `<w:p><w:pPr>${borda}${sombra}<w:spacing w:before="${idx===0?120:0}" w:after="${idx===linhas.length-1?120:0}"/><w:ind w:left="140"/></w:pPr>${pref}${wCorridas(el,{})}</w:p>`;
+      });
+      for(const im of tx.querySelectorAll("img")) xml += await wImagem(im,midia);
+      continue;
+    }
+    // toggle -> título em negrito + conteúdo (o Word não recolhe; exibe tudo)
+    if(no.tagName && no.tagName.toLowerCase()==="details"){
+      const sum = no.querySelector("summary");
+      const corpo2 = no.querySelector(".tg-corpo") || no;
+      if(sum) xml += wPar(`<w:r><w:rPr><w:b/></w:rPr><w:t xml:space="preserve">▸ ${xmlEsc(sum.textContent)}</w:t></w:r>`,{antes:160,depois:40});
+      xml += await wBlocos(corpo2,midia);
+      continue;
+    }
     if(tag === "h2") xml += wPar(wCorridas(no,{b:true,sz:32}),{antes:280,depois:80});
     else if(tag === "h3") xml += wPar(wCorridas(no,{b:true,sz:26}),{antes:220,depois:60});
     else if(tag === "ul" || tag === "ol"){
