@@ -218,6 +218,14 @@ mark.g-azul{background:#a9d3f0;color:#1a1a1a}
   border-radius:4px;font-size:13px;color:var(--tx);white-space:nowrap}
 .pop-lista button:hover{background:var(--surf2)}
 .pop-lista .amostra{width:14px;height:14px;border-radius:3px;flex:none}
+/* ditado por voz */
+.tb.gravando{background:var(--t0);color:#fff}
+@keyframes pulsa-voz{0%,100%{opacity:1}50%{opacity:.45}}
+.tb.gravando{animation:pulsa-voz 1.1s ease-in-out infinite}
+.voz-barra{display:flex;align-items:center;gap:10px;padding:8px 13px;margin:8px 0;
+  background:rgba(214,66,60,.1);border:1px solid var(--t0);border-radius:var(--r);font-size:13px}
+.voz-barra .ponto{width:9px;height:9px;border-radius:50%;background:var(--t0);flex:none;animation:pulsa-voz 1.1s infinite}
+.voz-barra .rascunho{flex:1;color:var(--mut);font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ed-pe{border-top:1px solid var(--line);margin-top:24px;padding:12px 0 60px;display:flex;gap:8px;align-items:center}
 .rapidos{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
 
@@ -1308,6 +1316,7 @@ function renderEditorNota(r){
       <button class="tb" data-cmd="quote" title="Citação">”</button>
       <button class="tb" data-cmd="hr" title="Linha separadora">—</button>
       <button class="tb" id="n-img" title="Inserir imagem">▣</button>
+      <button class="tb" id="n-voz" title="Ditar por voz">🎙</button>
       <span class="sep"></span>
       <div class="pop">
         <button class="tb" id="n-grifo-b" title="Marca-texto"><span style="background:#f4e07f;color:#1a1a1a;border-radius:2px;padding:0 3px">G</span></button>
@@ -1439,7 +1448,7 @@ function renderEditorNota(r){
     else if((e.ctrlKey||e.metaKey) && (e.key.toLowerCase()==="y" || (e.shiftKey && e.key.toLowerCase()==="z"))){ e.preventDefault(); restaurar(+1); }
   });
 
-  q("#n-voltar").onclick = async () => { await guardar(); fecharNota(); };
+  q("#n-voltar").onclick = async () => { pararVoz(); await guardar(); fecharNota(); };
   q("#n-desfazer").onmousedown = e => { e.preventDefault(); restaurar(-1); };
   q("#n-refazer").onmousedown = e => { e.preventDefault(); restaurar(+1); };
   atualizarBotoesHist();
@@ -1629,6 +1638,75 @@ function renderEditorNota(r){
     i.onchange = () => { if(i.files[0]) inserirImagem(i.files[0]); };
     i.click();
   };
+
+  /* ---- ditado por voz (reconhecimento nativo do Chrome) ----
+     Usa a Web Speech API. Vai transcrevendo em tempo real: a frase provisória
+     aparece numa barra até o navegador "fechar" o trecho, e aí o texto final é
+     inserido no ponto do cursor. Continua ouvindo até você parar. */
+  const VozRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const btnVoz = q("#n-voz");
+  let rec = null, gravando = false, ancora = null;
+
+  function inserirTextoFinal(txt){
+    if(!txt.trim()) return;
+    corpo.focus();
+    // devolve o cursor pro ponto onde estava antes de a barra roubar o foco
+    if(ancora){ const s = getSelection(); s.removeAllRanges(); s.addRange(ancora); }
+    fotografarJa();
+    // capitaliza início e garante espaço antes, pra ditado fluir sem colar palavra
+    const pre = corpo.textContent.slice(-1);
+    const espaco = (pre && pre !== " " && pre !== "\n") ? " " : "";
+    document.execCommand("insertText", false, espaco + txt.trim() + " ");
+    ancora = getSelection().rangeCount ? getSelection().getRangeAt(0).cloneRange() : null;
+    fotografar(); agendar();
+  }
+  function pararVoz(){
+    gravando = false;
+    if(rec){ try{ rec.stop(); }catch{} }
+    btnVoz.classList.remove("gravando");
+    const b = q("#voz-barra"); if(b) b.remove();
+  }
+  function iniciarVoz(){
+    if(!VozRec){ avisar("Ditado indisponível","Este navegador não tem reconhecimento de voz. No Android e no computador, use o Google Chrome."); return; }
+    rec = new VozRec();
+    rec.lang = "pt-BR";
+    rec.continuous = true;        // não para sozinho após uma frase
+    rec.interimResults = true;    // mostra o rascunho enquanto você fala
+    gravando = true;
+    // guarda onde inserir e mostra a barra de status logo acima do editor
+    ancora = getSelection().rangeCount && corpo.contains(getSelection().anchorNode)
+             ? getSelection().getRangeAt(0).cloneRange() : null;
+    btnVoz.classList.add("gravando");
+    const barra = document.createElement("div");
+    barra.className = "voz-barra"; barra.id = "voz-barra";
+    barra.innerHTML = `<span class="ponto"></span><span>Ouvindo…</span><span class="rascunho" id="voz-rascunho"></span><button class="btn-min" id="voz-parar">Parar</button>`;
+    corpo.parentNode.insertBefore(barra, corpo);
+    barra.querySelector("#voz-parar").onclick = pararVoz;
+
+    rec.onresult = e => {
+      let rascunho = "";
+      for(let i = e.resultIndex; i < e.results.length; i++){
+        const trecho = e.results[i][0].transcript;
+        if(e.results[i].isFinal) inserirTextoFinal(trecho);
+        else rascunho += trecho;
+      }
+      const r2 = q("#voz-rascunho"); if(r2) r2.textContent = rascunho;
+    };
+    rec.onerror = ev => {
+      if(ev.error === "not-allowed" || ev.error === "service-not-allowed"){
+        pararVoz();
+        avisar("Microfone bloqueado","O navegador não deu acesso ao microfone. Toque no cadeado ao lado do endereço e permita o microfone para este site.");
+      } else if(ev.error === "no-speech"){
+        // silêncio; o onend reinicia sozinho se ainda estiver gravando
+      }
+    };
+    rec.onend = () => {
+      // o Chrome encerra sozinho de tempos em tempos; se você não parou, retoma
+      if(gravando){ try{ rec.start(); }catch{} }
+    };
+    try{ rec.start(); }catch{}
+  }
+  btnVoz.onclick = () => { gravando ? pararVoz() : iniciarVoz(); };
   corpo.addEventListener("paste", e => {
     const img = [...(e.clipboardData?.items||[])].find(x=>x.type.startsWith("image/"));
     if(img){ e.preventDefault(); inserirImagem(img.getAsFile()); return; }
